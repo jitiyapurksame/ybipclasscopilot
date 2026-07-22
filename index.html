@@ -1,0 +1,2337 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+
+  :root{
+    --paper:#EAF6FF;
+    --card:rgba(255,251,240,0.8);
+    --ink:#3B2A1E;
+    --ink-soft:#7A6A52;
+    --moss:#3F7D3A;
+    --moss-light:rgba(63,125,58,0.16);
+    --amber:#E8A33D;
+    --amber-light:rgba(232,163,61,0.25);
+    --rust:#C1502B;
+    --rust-light:rgba(193,80,43,0.18);
+    --teal:#3F7D3A;
+    --line:rgba(122,90,58,0.28);
+    --coin:#F5A623;
+    --radius:16px;
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; height:100%; background:#8FCB6B;}
+  #app{
+    font-family:'Inter',sans-serif;
+    background:
+      radial-gradient(70px 70px at 84% 8%, rgba(255,232,150,0.9), rgba(255,232,150,0) 70%),
+      radial-gradient(50px 20px at 15% 8%, rgba(255,255,255,0.85), rgba(255,255,255,0) 72%),
+      radial-gradient(65px 24px at 40% 5%, rgba(255,255,255,0.75), rgba(255,255,255,0) 72%),
+      radial-gradient(45px 18px at 62% 11%, rgba(255,255,255,0.7), rgba(255,255,255,0) 72%),
+      linear-gradient(180deg, #6EC6FF 0%, #A8DDFF 20%, #CFEFC0 38%, #9FCC7C 52%, #7DB85B 72%, #5E9E45 100%);
+    color:var(--ink);
+    height:100vh;
+    height:100dvh;
+    display:flex;
+    flex-direction:column;
+    max-width:520px;
+    margin:0 auto;
+    position:relative;
+    overflow:hidden;
+  }
+  .scene{
+    position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none;
+  }
+  .scene svg{position:absolute;}
+
+  .mono{font-family:'IBM Plex Mono',monospace; letter-spacing:0.03em;}
+  .display{font-family:'Space Grotesk',sans-serif;}
+
+  header.topbar{
+    padding:18px 20px 12px;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-shrink:0;
+  }
+  header.topbar .eyebrow{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--ink-soft);
+  }
+  header.topbar h1{
+    margin:2px 0 0;
+    font-size:22px;
+    font-weight:700;
+  }
+  header.topbar .badge{
+    font-size:11px;
+    background:var(--moss-light);
+    border:1px solid rgba(63,125,58,0.35);
+    color:var(--moss);
+    padding:5px 10px;
+    border-radius:20px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .header-right{display:flex; align-items:center; gap:8px;}
+  .quiet-toggle{
+    width:30px; height:30px; border-radius:50%; flex-shrink:0;
+    background:rgba(255,255,255,0.55); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    padding:0;
+  }
+  .quiet-toggle svg{width:16px; height:16px;}
+  .quiet-toggle.on{background:rgba(63,125,58,0.18); border-color:rgba(63,125,58,0.4);}
+  
+
+  main{
+    flex:1;
+    overflow-y:auto;
+    padding:4px 16px 24px;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  section.screen{display:none;}
+  section.screen.active{display:block; animation:fade .18s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    margin-bottom:14px;
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    box-shadow:0 2px 10px rgba(63,125,58,0.1);
+  }
+  .card h2{
+    margin:0 0 4px;
+    font-size:15px;
+    font-weight:700;
+  }
+  .card .sub{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-bottom:12px;
+  }
+
+  /* --- Mission list --- */
+  .row-icon{
+    width:32px; height:32px; border-radius:9px; flex-shrink:0;
+    background:var(--moss-light);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .row-icon svg{width:17px; height:17px;}
+  .mission-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 4px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .mission-row:last-child{border-bottom:none;}
+  .mission-check{
+    width:26px; height:26px; flex-shrink:0;
+    border-radius:8px;
+    border:2px solid var(--moss);
+    display:flex; align-items:center; justify-content:center;
+    transition:background .15s;
+  }
+  .mission-check.done{background:var(--moss);}
+  .mission-check svg{width:16px; height:16px; stroke:white; opacity:0; transition:opacity .1s;}
+  .mission-check.done svg{opacity:1;}
+  .mission-text{font-size:15px; font-weight:500; flex:1;}
+  .mission-text.done{color:var(--ink-soft); text-decoration:line-through;}
+
+  /* --- Trail / Ladder --- */
+  .trail{position:relative; padding-left:6px;}
+  .trail-item{
+    display:flex; align-items:flex-start; gap:14px;
+    position:relative; padding-bottom:22px; cursor:pointer;
+  }
+  .trail-item:last-child{padding-bottom:4px;}
+  .trail-item::before{
+    content:''; position:absolute; left:17px; top:38px; bottom:0;
+    width:2px; border-left:2px dotted var(--line);
+  }
+  .trail-item:last-child::before{display:none;}
+  .trail-node{
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px;
+    border:2px solid var(--line); color:var(--ink-soft); background:var(--card);
+    transition:all .15s; z-index:1;
+  }
+  .trail-node.reached{background:var(--moss); border-color:var(--moss); color:white;}
+  .trail-node.current{background:var(--amber); border-color:var(--amber); color:white; box-shadow:0 0 0 4px var(--amber-light);}
+  .trail-label{padding-top:6px;}
+  .trail-label .name{font-size:15px; font-weight:700; display:flex; align-items:center; gap:7px;}
+  .trail-label .name svg{width:15px; height:15px; flex-shrink:0;}
+  .trail-label .desc{font-size:12.5px; color:var(--ink-soft); margin-top:1px;}
+
+  .best-strip{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12px; color:var(--ink-soft); margin-top:2px; padding:0 2px;
+  }
+  .best-strip b{color:var(--amber); font-family:'IBM Plex Mono',monospace;}
+
+  /* --- Phrase chips --- */
+  .phrase-group-title{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.1em;
+    color:var(--teal); font-weight:700; margin:18px 2px 8px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .phrase-group-title svg{width:14px; height:14px; flex-shrink:0;}
+  .phrase-group-title:first-child{margin-top:2px;}
+  .phrase-chip{
+    background:var(--card); border:1.5px solid var(--line); border-radius:14px;
+    padding:16px 16px; margin-bottom:10px;
+    font-size:16px; font-weight:600; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    transition:transform .08s;
+  }
+  .phrase-chip:active{transform:scale(0.97);}
+  .phrase-chip .tap-hint{font-size:11px; color:var(--ink-soft); font-weight:500; flex-shrink:0;}
+
+  /* --- Compose box (Say This) --- */
+  .compose-box{
+    background:var(--card); border:1.5px solid var(--line); border-radius:14px;
+    padding:12px; margin-top:2px;
+  }
+  .compose-box textarea{
+    width:100%; border:none; outline:none; resize:none;
+    font-family:'Inter',sans-serif; font-size:15px; color:var(--ink);
+    background:transparent; padding:2px; line-height:1.4;
+  }
+  .compose-show-btn{
+    width:100%; margin-top:8px; border:none; border-radius:10px;
+    background:var(--moss); color:white; font-weight:700; font-size:14px;
+    padding:12px; cursor:pointer;
+  }
+  .compose-show-btn:active{opacity:0.85;}
+  .sos-title{color:#E3D9A8;}
+  .sos-compose{
+    background:rgba(255,255,255,0.06);
+    border-color:rgba(232,163,61,0.4);
+  }
+  .sos-compose textarea{color:white;}
+  .sos-compose textarea::placeholder{color:rgba(255,255,255,0.45);}
+  .sos-show-btn{
+    background:linear-gradient(135deg, #FF6B4A, var(--rust));
+    box-shadow:0 0 16px rgba(255,107,74,0.45);
+  }
+
+  /* --- Group work steps --- */
+  .step-card{display:flex; gap:14px; margin-bottom:4px;}
+  .step-num{
+    width:34px; height:34px; border-radius:10px; background:var(--teal); color:white;
+    display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace;
+    font-weight:600; flex-shrink:0; margin-top:2px;
+  }
+  .step-body{flex:1; padding-bottom:20px; border-left:2px dotted var(--line); margin-left:17px; padding-left:20px; margin-top:-34px; padding-top:36px;}
+  .step-card:last-child .step-body{border-left:none;}
+  .step-th{font-size:13px; color:var(--ink-soft); margin-bottom:2px;}
+  .step-en{font-size:14px; color:var(--ink-soft); margin-bottom:10px; font-style:italic;}
+
+  /* --- Checklist (teacher visibility) --- */
+  .check-row{
+    display:flex; align-items:center; gap:14px; padding:14px 6px;
+    border-bottom:1px solid var(--line); cursor:pointer;
+  }
+  .check-row:last-child{border-bottom:none;}
+  .check-box{
+    width:26px; height:26px; border:2px solid var(--teal); border-radius:6px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .check-box.done{background:var(--teal);}
+  .check-box svg{width:15px; height:15px; stroke:white; opacity:0;}
+  .check-box.done svg{opacity:1;}
+  .check-th{font-size:15px; font-weight:600;}
+  .check-en{font-size:12px; color:var(--ink-soft);}
+
+  /* --- Math Notes --- */
+  .math-subtabs{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; margin-bottom:2px;}
+  .math-subtab{
+    flex-shrink:0; padding:9px 15px; border-radius:20px;
+    background:var(--card); border:1.5px solid var(--line);
+    font-size:12.5px; font-weight:700; cursor:pointer; color:var(--ink-soft);
+    font-family:'Inter',sans-serif;
+  }
+  .math-subtab.active{background:var(--moss); color:white; border-color:var(--moss);}
+  .math-panel{display:none;}
+  .math-panel.active{display:block;}
+
+  .math-controls{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; align-items:flex-end;}
+  .math-controls label{
+    display:flex; flex-direction:column; font-size:11px; color:var(--ink-soft);
+    gap:4px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
+  }
+  .math-controls input, .math-controls select{
+    padding:9px 10px; border-radius:10px; border:1.5px solid var(--line);
+    font-size:14px; width:84px; font-family:'Inter',sans-serif;
+    background:var(--card); color:var(--ink);
+  }
+  .math-controls select{width:auto;}
+  .math-btn{
+    padding:10px 15px; border-radius:10px; border:none;
+    background:var(--moss); color:white; font-weight:700; font-size:13px;
+    cursor:pointer; font-family:'Inter',sans-serif;
+  }
+  .math-btn.secondary{background:var(--card); color:var(--ink); border:1.5px solid var(--line);}
+
+  .counter-grid{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; min-height:52px;}
+  .counter{
+    width:42px; height:42px; border-radius:50%; background:var(--coin);
+    display:flex; align-items:center; justify-content:center; position:relative;
+    cursor:pointer; font-weight:700; color:white; font-size:14px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .counter.crossed{opacity:0.55;}
+  .counter.crossed::before, .counter.crossed::after{
+    content:''; position:absolute; width:46px; height:3.5px; background:var(--rust);
+    top:50%; left:50%; border-radius:2px;
+  }
+  .counter.crossed::before{transform:translate(-50%,-50%) rotate(45deg);}
+  .counter.crossed::after{transform:translate(-50%,-50%) rotate(-45deg);}
+
+  .math-summary{font-size:13px; color:var(--ink-soft); font-weight:600;}
+  .math-limit{
+    font-size:11.5px; color:var(--rust); font-weight:600; margin:-6px 0 12px;
+  }
+  .math-svg-wrap{
+    background:rgba(255,255,255,0.5); border:1px solid var(--line); border-radius:12px;
+    padding:10px; margin-bottom:10px;
+  }
+  .math-svg-wrap svg{display:block; width:100%; height:auto;}
+
+  .pie-block{display:flex; flex-direction:column; gap:10px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--line);}
+  .pie-block:last-child{border-bottom:none;}
+  .pie-block-head{display:flex; justify-content:space-between; align-items:center;}
+  .pie-remove{background:none; border:none; color:var(--rust); font-weight:700; font-size:12px; cursor:pointer;}
+  .pie-display{display:flex; align-items:center; gap:14px;}
+  .pie-display svg{width:120px; height:120px; flex-shrink:0;}
+  .pie-fraction{font-family:'IBM Plex Mono',monospace; font-size:20px; font-weight:700; color:var(--ink);}
+
+  .hto-wrap{overflow-x:auto; padding:4px 0;}
+  .hto-grid{display:flex; flex-direction:column; min-width:220px; max-width:280px;}
+  .hto-row{display:grid; grid-template-columns:30px repeat(3,1fr); align-items:center; text-align:center;}
+  .hto-cell{
+    font-family:'IBM Plex Mono',monospace; font-size:21px; font-weight:700;
+    padding:5px 0; min-height:32px; color:var(--ink);
+    border-right:2px solid var(--line);
+  }
+  .hto-cell.hto-margin{border-right:none;}
+  .hto-header .hto-cell{font-size:13px; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.05em;}
+  .hto-annot .hto-cell{font-size:13px; color:var(--rust); font-weight:800; min-height:18px; padding:0 0 2px;}
+  .hto-strike{text-decoration:line-through; color:var(--ink-soft);}
+  .hto-op{font-size:20px; font-weight:800; color:var(--ink);}
+  .hto-rule-row{display:grid; grid-template-columns:30px repeat(3,1fr); padding:2px 0 4px;}
+  .hto-rule{border-bottom:2.5px solid var(--ink); margin:0 6px;}
+  .hto-result .hto-cell{color:var(--ink);}
+  .hto-highlight{color:var(--rust) !important;}
+
+  /* --- Reminders --- */
+  .remind-type-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+  .remind-type-chip{
+    padding:9px 14px; border-radius:20px; background:var(--card); border:1.5px solid var(--line);
+    font-size:12.5px; font-weight:700; color:var(--ink-soft); cursor:pointer; font-family:'Inter',sans-serif;
+  }
+  .remind-type-chip.selected{background:var(--moss); color:white; border-color:var(--moss);}
+  .remind-form{display:flex; flex-direction:column; gap:12px; margin-bottom:6px;}
+  .remind-form label{
+    display:flex; flex-direction:column; gap:5px; font-size:11px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft);
+  }
+  .remind-form label .opt{text-transform:none; font-weight:500; letter-spacing:0; color:var(--ink-soft);}
+  .remind-form input, .remind-form select{
+    padding:10px 12px; border-radius:10px; border:1.5px solid var(--line);
+    font-size:15px; font-family:'Inter',sans-serif; background:var(--card); color:var(--ink);
+  }
+  #remindAddBtn{margin-top:12px; width:100%;}
+
+  .remind-row{
+    display:flex; align-items:center; gap:12px; padding:12px 4px;
+    border-bottom:1px solid var(--line); cursor:pointer;
+  }
+  .remind-row:last-child{border-bottom:none;}
+  .remind-check{
+    width:26px; height:26px; flex-shrink:0; border-radius:8px;
+    border:2px solid var(--moss); display:flex; align-items:center; justify-content:center;
+  }
+  .remind-check svg{width:16px; height:16px; stroke:white; opacity:0;}
+  .remind-check.done{background:var(--moss);}
+  .remind-check.done svg{opacity:1;}
+  .remind-info{flex:1; min-width:0;}
+  .remind-title{font-size:14.5px; font-weight:700;}
+  .remind-meta{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .remind-row.done .remind-title{color:var(--ink-soft); text-decoration:line-through;}
+  .remind-row.overdue .remind-meta{color:var(--rust); font-weight:700;}
+  .remind-del{
+    background:none; border:none; font-size:18px; color:var(--ink-soft);
+    cursor:pointer; padding:4px 6px; flex-shrink:0;
+  }
+  .remind-empty{font-size:13px; color:var(--ink-soft); padding:8px 4px;}
+  .remind-share-row{margin-top:6px;}
+  #remindShareBtn{width:100%;}
+  .remind-share-text{
+    width:100%; margin-top:10px; padding:10px; border-radius:10px; border:1.5px solid var(--line);
+    background:var(--card); color:var(--ink); font-size:13px; font-family:'Inter',sans-serif; resize:none;
+  }
+
+  /* --- SOS --- */
+  .sos-card{
+    background:
+      radial-gradient(46px 18px at 15% 14%, rgba(255,242,180,0.4), rgba(255,242,180,0) 72%),
+      radial-gradient(60px 22px at 78% 10%, rgba(255,242,180,0.35), rgba(255,242,180,0) 72%),
+      radial-gradient(38px 15px at 40% 22%, rgba(255,242,180,0.3), rgba(255,242,180,0) 72%),
+      radial-gradient(50px 18px at 88% 45%, rgba(255,255,255,0.22), rgba(255,255,255,0) 72%),
+      radial-gradient(42px 16px at 12% 60%, rgba(255,255,255,0.2), rgba(255,255,255,0) 72%),
+      linear-gradient(165deg, #4C8F45 0%, #2E5F2C 50%, #17301A 100%);
+    color:white; border:none;
+  }
+  .sos-head{display:flex; align-items:center; gap:12px; margin-bottom:4px;}
+  .sos-icon-wrap{
+    width:42px; height:42px; border-radius:12px; flex-shrink:0;
+    background:rgba(198,40,40,0.28); border:1px solid rgba(255,107,107,0.5);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 14px rgba(198,40,40,0.45);
+  }
+  .sos-icon-wrap svg{width:23px; height:23px;}
+  .sos-card h2{color:white; margin:0;}
+  .sos-card .sub{color:#D9CFA0;}
+  .sos-chip{
+    background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.28);
+    color:white;
+  }
+  .sos-chip .tap-hint{color:#FF8A80; font-weight:700;}
+
+  /* --- Situation accordion (Mission Control) --- */
+  .situation-card{
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15);
+    border-radius:14px; margin-bottom:10px; overflow:hidden;
+  }
+  .situation-head{
+    display:flex; align-items:center; gap:12px; padding:14px 14px;
+    cursor:pointer;
+  }
+  .situation-icon{
+    width:34px; height:34px; border-radius:10px; flex-shrink:0;
+    background:rgba(232,163,61,0.18); border:1px solid rgba(232,163,61,0.4);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .situation-icon svg{width:19px; height:19px;}
+  .situation-label{flex:1; font-size:14px; font-weight:600; line-height:1.3;}
+  .situation-chevron{
+    width:18px; height:18px; flex-shrink:0; color:rgba(255,255,255,0.5);
+    transition:transform .2s;
+  }
+  .situation-card.open .situation-chevron{transform:rotate(180deg);}
+  .situation-detail{
+    display:none; padding:0 14px 16px; border-top:1px solid rgba(255,255,255,0.1);
+    padding-top:14px;
+  }
+  .situation-card.open .situation-detail{display:block;}
+
+  .brain-note{
+    display:flex; gap:10px; align-items:flex-start; margin-bottom:14px;
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2);
+    border-radius:12px; padding:12px;
+  }
+  .brain-note svg{width:20px; height:20px; flex-shrink:0; margin-top:1px;}
+  .brain-note p{margin:0; font-size:13px; line-height:1.5; color:#DCE3FF;}
+
+  .block-title{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#E3D9A8; font-weight:700; margin:14px 0 8px;}
+  .block-title:first-of-type{margin-top:0;}
+
+  .try-row{
+    display:flex; align-items:center; gap:10px; padding:9px 4px;
+    font-size:14px; color:#EDF0FF; cursor:pointer;
+  }
+  .try-box{
+    width:20px; height:20px; border-radius:6px; border:1.6px solid rgba(255,255,255,0.4); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .try-box svg{width:12px; height:12px; stroke:white; opacity:0;}
+  .try-box.checked{background:var(--moss); border-color:var(--moss);}
+  .try-box.checked svg{opacity:1;}
+  .try-row.checked span{text-decoration:line-through; opacity:0.6;}
+
+  .mission-instruction{
+    font-size:14px; font-weight:700; color:white; margin-bottom:10px;
+  }
+  .mission-instruction .sub-hint{display:block; font-weight:500; font-size:12px; color:#D9CFA0; margin-top:2px;}
+  .choice-row{display:flex; flex-wrap:wrap; gap:8px;}
+  .choice-chip{
+    background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.28);
+    color:#EDF0FF; font-size:12.5px; font-weight:600; padding:9px 12px; border-radius:20px;
+    cursor:pointer;
+  }
+  .choice-chip.selected{background:var(--moss); border-color:var(--moss); color:white;}
+
+  .checkin-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
+  .checkin-chip{
+    background:rgba(255,255,255,0.07); border:1.5px solid rgba(232,163,61,0.4);
+    color:#EDF0FF; font-size:12.5px; font-weight:600; padding:9px 14px; border-radius:20px;
+    cursor:pointer;
+  }
+  .checkin-chip.selected{background:#3F7D3A; border-color:#3F7D3A; color:white;}
+  .checkin-result{
+    background:rgba(255,255,255,0.05); border:1px dashed rgba(255,255,255,0.25);
+    border-radius:12px; padding:12px; display:none;
+  }
+  .checkin-result.show{display:block;}
+  .checkin-result .result-lead{font-size:12.5px; color:#D9CFA0; margin-bottom:8px;}
+
+  /* --- XP Board (retro game style) --- */
+  .pixel-font{font-family:'Press Start 2P', monospace; letter-spacing:0.02em;}
+  .pixel-tile{
+    border-radius:0 !important;
+    clip-path: polygon(
+      0 6px, 6px 6px, 6px 0,
+      calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
+      100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
+      6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
+    );
+  }
+  .xp-level-card{background:linear-gradient(135deg, var(--moss), #1B3A1A); color:white; border:none; box-shadow:0 4px 0 rgba(0,0,0,0.28);}
+  .xp-reward-card{background:linear-gradient(135deg, var(--rust), #5C2A16); color:white; border:none; box-shadow:0 4px 0 rgba(0,0,0,0.28);}
+  .xp-level-top{display:flex; align-items:center; gap:14px; margin-bottom:12px;}
+  .xp-icon-wrap{
+    width:44px; height:44px; background:rgba(255,255,255,0.18);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .xp-icon-wrap svg{width:24px; height:24px;}
+  .xp-icon-wrap.red{background:rgba(255,255,255,0.18);}
+  .xp-level-num{font-size:16px; line-height:1.4;}
+  .xp-level-sub{font-size:12.5px; opacity:0.88; margin-top:5px;}
+  .progress-track{
+    display:flex; gap:3px; height:16px; padding:3px;
+    background:rgba(0,0,0,0.25); border:2px solid rgba(255,255,255,0.3);
+  }
+  .meter-seg{flex:1; background:rgba(255,255,255,0.15);}
+  .meter-seg.lit{background:var(--coin);}
+  .rewards-earned{font-size:12px; opacity:0.85; margin-top:10px; font-family:'IBM Plex Mono',monospace;}
+
+  .stat-row{display:flex; gap:12px; margin-bottom:14px;}
+  .stat-chip{
+    flex:1; background:var(--card); border:1px solid var(--line);
+    padding:14px; text-align:center; box-shadow:0 3px 0 rgba(0,0,0,0.22);
+  }
+  .stat-num{font-size:20px; color:var(--coin); display:flex; align-items:center; justify-content:center; gap:6px;}
+  .stat-num svg{width:16px; height:16px;}
+  .stat-label{font-size:11.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.06em; margin-top:8px;}
+
+  .xp-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .xp-action-btn{
+    position:relative; background:var(--card); border:1.5px solid var(--line);
+    padding:14px 10px 12px; text-align:center; cursor:pointer;
+    box-shadow:3px 3px 0 rgba(0,0,0,0.3);
+    transition:transform .08s, box-shadow .08s;
+  }
+  .xp-action-btn:active{transform:translate(2px,2px); box-shadow:1px 1px 0 rgba(0,0,0,0.3);}
+  .xp-action-icon{
+    width:38px; height:38px; margin:0 auto 6px; background:var(--moss-light);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .xp-action-icon svg{width:20px; height:20px;}
+  .xp-action-label{font-size:12.5px; font-weight:700; line-height:1.2;}
+  .xp-action-value{font-size:10px; color:var(--coin); font-weight:700; margin-top:6px;}
+  .xp-action-count{
+    position:absolute; top:6px; right:6px; min-width:18px; height:18px; padding:0 4px;
+    background:var(--moss); color:white; border-radius:9px; font-size:10px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace;
+  }
+  .xp-action-undo{
+    position:absolute; top:6px; left:6px; width:18px; height:18px; border-radius:50%;
+    background:rgba(63,125,58,0.14); border:1px solid rgba(63,125,58,0.35);
+    color:var(--ink); font-size:12px; font-weight:700; line-height:16px;
+    text-align:center;
+  }
+  .xp-action-btn.bump{animation:bump .3s ease;}
+  @keyframes bump{0%{transform:scale(1);} 40%{transform:scale(1.08);} 100%{transform:scale(1);}}
+
+  .xp-float{
+    position:fixed; z-index:80; font-size:13px; color:var(--coin); pointer-events:none;
+    display:flex; align-items:center; gap:5px;
+    animation:floatup 0.9s ease forwards;
+    text-shadow:1px 1px 0 rgba(0,0,0,0.4);
+  }
+  .xp-float svg{width:14px; height:14px; animation:coinspin 0.6s linear infinite;}
+  @keyframes floatup{
+    0%{opacity:0; transform:translateY(0) scale(0.8);}
+    15%{opacity:1; transform:translateY(-6px) scale(1);}
+    100%{opacity:0; transform:translateY(-46px) scale(1);}
+  }
+  @keyframes coinspin{
+    0%{transform:scaleX(1);} 50%{transform:scaleX(0.15);} 100%{transform:scaleX(1);}
+  }
+
+  /* --- Fullscreen phrase overlay --- */
+  #overlay{
+    position:absolute; inset:0; z-index:50;
+    display:none; align-items:center; justify-content:center;
+    flex-direction:column; text-align:center; padding:40px 28px;
+    color:white;
+  }
+  #overlay.show{display:flex;}
+  #overlay .ov-text{
+    font-family:'Space Grotesk',sans-serif; font-weight:700;
+    font-size:clamp(30px, 9vw, 46px); line-height:1.15;
+  }
+  #overlay .ov-timer{
+    margin-top:26px; font-family:'IBM Plex Mono',monospace; font-size:15px; opacity:0.85;
+  }
+  #overlay .ov-close{
+    position:absolute; top:18px; right:18px;
+    width:44px; height:44px; border-radius:50%;
+    background:rgba(255,255,255,0.18);
+    display:flex; align-items:center; justify-content:center;
+  }
+  #overlay .ov-hint{
+    position:absolute; bottom:28px; font-size:12px; opacity:0.7; letter-spacing:0.06em; text-transform:uppercase;
+  }
+
+  /* --- Bottom nav --- */
+  nav.tabbar{
+    display:flex; flex-shrink:0;
+    border-top:1px solid var(--line);
+    background:rgba(255,255,255,0.7);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    padding:6px 4px calc(env(safe-area-inset-bottom, 6px) + 6px);
+  }
+  nav.tabbar button{
+    flex:1; background:none; border:none; padding:8px 2px 4px;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:var(--ink-soft); font-family:'Inter',sans-serif; font-size:10.5px; font-weight:600;
+    cursor:pointer;
+  }
+  .nav-icon{
+    width:24px; height:24px; display:flex; align-items:center; justify-content:center;
+    border-radius:8px; transition:background .15s, transform .15s;
+  }
+  .nav-icon svg{width:20px; height:20px;}
+  nav.tabbar button.active{color:var(--moss);}
+  nav.tabbar button.active .nav-icon{background:var(--moss-light); transform:scale(1.08);}
+  nav.tabbar button.sos-tab.active{color:var(--rust);}
+  nav.tabbar button.sos-tab.active .nav-icon{background:var(--rust-light);}
+</style>
+
+<div id="app">
+  <div class="scene" id="scene"></div>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow" id="dateLabel">Today</div>
+      <h1 id="screenTitle">J.J.'s Class Missions</h1>
+    </div>
+    <div class="header-right">
+      <div class="badge" id="headerBadge">Level 0</div>
+      <button class="quiet-toggle" id="quietToggle" title="Quiet mode"></button>
+    </div>
+  </header>
+
+  <main>
+    <!-- TODAY -->
+    <section class="screen active" id="screen-today">
+      <div class="card">
+        <h2>Today's small wins</h2>
+        <div class="sub">Tap when it happens. No pressure to do them all.</div>
+        <div id="missionList"></div>
+      </div>
+      <div class="card">
+        <h2>The Ladder</h2>
+        <div class="sub">Tap the highest step you reached today.</div>
+        <div class="trail" id="ladderList"></div>
+      </div>
+    </section>
+
+    <!-- SAY THIS -->
+    <section class="screen" id="screen-say">
+      <div class="card">
+        <h2>Say This</h2>
+        <div class="sub">Tap a line to show it full screen — say it, or hold up the iPad.</div>
+        <div class="phrase-group-title" id="grpTitle-start">Start talking</div>
+        <div id="grp-start"></div>
+        <div class="phrase-group-title" id="grpTitle-respond">Respond to someone</div>
+        <div id="grp-respond"></div>
+        <div class="phrase-group-title" id="grpTitle-moment">Need a moment</div>
+        <div id="grp-moment"></div>
+        <div class="phrase-group-title">Finish your sentence</div>
+        <div class="compose-box">
+          <textarea id="sayCompose" rows="3" placeholder="Tap a starter above, then type the rest of your idea here..."></textarea>
+          <button id="sayShowBtn" class="compose-show-btn">Show full screen</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GROUP WORK -->
+    <section class="screen" id="screen-group">
+      <div class="card">
+        <h2>Group Work Survival Guide</h2>
+        <div class="sub">Four moments. One line for each.</div>
+        <div id="groupSteps"></div>
+        <div class="phrase-group-title">Add your own details</div>
+        <div class="compose-box">
+          <textarea id="groupCompose" rows="3" placeholder="Tap a line above, then finish it — e.g. I can write about..."></textarea>
+          <button id="groupShowBtn" class="compose-show-btn">Show full screen</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHECK -->
+    <section class="screen" id="screen-check">
+      <div class="card">
+        <h2>Teacher Visibility Check</h2>
+        <div class="sub">Five ways to be seen today. Tick when done.</div>
+        <div id="checkList"></div>
+      </div>
+    </section>
+
+    <!-- XP -->
+    <section class="screen" id="screen-xp">
+      <div class="card xp-level-card pixel-tile">
+        <div class="xp-level-top">
+          <div class="xp-icon-wrap" id="levelIconWrap"></div>
+          <div>
+            <div class="xp-level-num pixel-font" id="xpLevelNum">LV. 1</div>
+            <div class="xp-level-sub" id="xpLevelSub">0 / 100 XP to next level</div>
+          </div>
+        </div>
+        <div class="progress-track" id="levelBar"></div>
+      </div>
+
+      <div class="card xp-reward-card pixel-tile">
+        <div class="xp-level-top">
+          <div class="xp-icon-wrap red" id="giftIconWrap"></div>
+          <div>
+            <div class="xp-level-num pixel-font" id="rewardLabel">0 / 500</div>
+            <div class="xp-level-sub" id="rewardSub">XP to next reward</div>
+          </div>
+        </div>
+        <div class="progress-track" id="rewardBar"></div>
+        <div class="rewards-earned" id="rewardsEarned">Rewards earned so far: 0</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-chip pixel-tile"><div class="stat-num pixel-font" id="xpTodayNum"><span>0</span></div><div class="stat-label">XP today</div></div>
+        <div class="stat-chip pixel-tile"><div class="stat-num pixel-font" id="xpWeekNum"><span>0</span></div><div class="stat-label">XP this week</div></div>
+      </div>
+
+      <div class="card">
+        <h2>Earn XP</h2>
+        <div class="sub">Tap when it happens in class. Tap the small − if you tapped by mistake.</div>
+        <div class="xp-grid" id="xpGrid"></div>
+      </div>
+    </section>
+
+    <!-- MATH -->
+    <section class="screen" id="screen-math">
+      <div class="math-subtabs" id="mathSubtabs">
+        <button class="math-subtab active" data-math="cross">Cross Out</button>
+        <button class="math-subtab" data-math="line">Number Line</button>
+        <button class="math-subtab" data-math="pie">Fraction</button>
+        <button class="math-subtab" data-math="angle">Angle</button>
+        <button class="math-subtab" data-math="shape">Shape</button>
+        <button class="math-subtab" data-math="hto">HTO</button>
+      </div>
+
+      <!-- Cross Out -->
+      <div class="math-panel active" id="math-cross">
+        <div class="card">
+          <h2>Cross It Out</h2>
+          <div class="sub">Good for addition and subtraction. Set a starting amount, then tap counters to cross them out.</div>
+          <div class="math-controls">
+            <label>Start with
+              <input type="number" id="counterStartInput" value="5" min="0" max="50">
+            </label>
+            <button class="math-btn" id="counterSetBtn">Set</button>
+            <button class="math-btn secondary" id="counterAddBtn">+1 counter</button>
+            <button class="math-btn secondary" id="counterResetBtn">Clear</button>
+          </div>
+          <div class="math-limit">Limit: 0 to 50 counters</div>
+          <div id="counterGrid" class="counter-grid"></div>
+          <div id="counterSummary" class="math-summary"></div>
+        </div>
+      </div>
+
+      <!-- Number Line -->
+      <div class="math-panel" id="math-line">
+        <div class="card">
+          <h2>Number Line</h2>
+          <div class="sub">Set a start and end, then tap two numbers to see the jump between them.</div>
+          <div class="math-controls">
+            <label>From <input type="number" id="nlStart" value="0" min="-200" max="200"></label>
+            <label>To <input type="number" id="nlEnd" value="10" min="-200" max="200"></label>
+            <button class="math-btn" id="nlBuildBtn">Build</button>
+            <button class="math-btn secondary" id="nlClearBtn">Clear jump</button>
+          </div>
+          <div class="math-limit">Limit: To must be bigger than From, and no more than 40 apart</div>
+          <div id="nlSvgWrap" class="math-svg-wrap"></div>
+          <div id="nlSummary" class="math-summary"></div>
+        </div>
+      </div>
+
+      <!-- Fraction Pie -->
+      <div class="math-panel" id="math-pie">
+        <div class="card">
+          <h2>Fraction Pie</h2>
+          <div class="sub">Set the number of slices and how many are shaded.</div>
+          <div class="math-limit">Limit: 1 to 12 slices. Shaded can't be more than the number of slices.</div>
+          <div id="pieList"></div>
+          <button class="math-btn secondary" id="pieAddBtn">+ Add another pie</button>
+        </div>
+      </div>
+
+      <!-- Angle -->
+      <div class="math-panel" id="math-angle">
+        <div class="card">
+          <h2>Angle</h2>
+          <div class="sub">Type a number of degrees to see the angle.</div>
+          <div class="math-controls">
+            <label>Degrees <input type="number" id="angleDeg" value="45" min="0" max="360"></label>
+          </div>
+          <div class="math-limit">Limit: 0 to 360 degrees</div>
+          <div id="angleSvgWrap" class="math-svg-wrap"></div>
+        </div>
+      </div>
+
+      <!-- Shape -->
+      <div class="math-panel" id="math-shape">
+        <div class="card">
+          <h2>Shape</h2>
+          <div class="sub">Pick a shape and its measurements.</div>
+          <div class="math-controls">
+            <label>Shape
+              <select id="shapeType">
+                <option value="rect">Rectangle</option>
+                <option value="square">Square</option>
+                <option value="triangle">Triangle</option>
+                <option value="circle">Circle</option>
+              </select>
+            </label>
+            <label class="shape-input shape-w">Width <input type="number" id="shapeW" value="8" min="1" max="200"></label>
+            <label class="shape-input shape-h">Height <input type="number" id="shapeH" value="5" min="1" max="200"></label>
+            <label class="shape-input shape-base" style="display:none">Base <input type="number" id="shapeBase" value="8" min="1" max="200"></label>
+            <label class="shape-input shape-h2" style="display:none">Height <input type="number" id="shapeH2" value="5" min="1" max="200"></label>
+            <label class="shape-input shape-r" style="display:none">Radius <input type="number" id="shapeR" value="5" min="1" max="100"></label>
+          </div>
+          <div class="math-limit">Limit: 1 to 200 (radius up to 100)</div>
+          <div id="shapeSvgWrap" class="math-svg-wrap"></div>
+        </div>
+      </div>
+
+      <!-- HTO -->
+      <div class="math-panel" id="math-hto">
+        <div class="card">
+          <h2>HTO Column Method</h2>
+          <div class="sub">Hundreds, Tens, Ones. When a column can't be done, watch it borrow (or carry) from its neighbor — shown in red.</div>
+          <div class="math-controls">
+            <label>Operation
+              <select id="htoOp">
+                <option value="sub">Subtract (−)</option>
+                <option value="add">Add (+)</option>
+              </select>
+            </label>
+            <label>Top number <input type="number" id="htoTop" value="162" min="0" max="999"></label>
+            <label>Bottom number <input type="number" id="htoBottom" value="9" min="0" max="999"></label>
+            <button class="math-btn" id="htoBuildBtn">Show</button>
+          </div>
+          <div class="math-limit">Limit: numbers 0 to 999. For subtraction the top number must be equal to or bigger. For addition the total must stay under 1000.</div>
+          <div id="htoTableWrap" class="hto-wrap"></div>
+          <div id="htoSummary" class="math-summary"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REMIND -->
+    <section class="screen" id="screen-remind">
+      <div class="card">
+        <h2>New Reminder</h2>
+        <div class="sub">Fill this in, then save it — or share it with a parent right away.</div>
+        <div class="remind-type-row" id="remindTypeRow">
+          <button class="remind-type-chip" data-type="bring">Bring something</button>
+          <button class="remind-type-chip" data-type="presentation">Presentation</button>
+          <button class="remind-type-chip" data-type="test">Test</button>
+          <button class="remind-type-chip" data-type="group">Group work</button>
+        </div>
+        <div class="remind-form">
+          <label>What <input type="text" id="remindWhat" placeholder="e.g. recorder, poster, notes"></label>
+          <label>Class / Subject
+            <select id="remindClass">
+              <option value="">Select a subject</option>
+              <option value="Math">Math</option>
+              <option value="Chemistry">Chemistry</option>
+              <option value="Biology">Biology</option>
+              <option value="Physics">Physics</option>
+              <option value="Global Perspectives">Global Perspectives</option>
+              <option value="ICT">ICT</option>
+              <option value="HPE">HPE</option>
+              <option value="Thai">Thai</option>
+              <option value="Chinese">Chinese</option>
+              <option value="__other">Other…</option>
+            </select>
+          </label>
+          <label id="remindClassOtherWrap" style="display:none;">Other subject
+            <input type="text" id="remindClassOther" placeholder="Type the subject">
+          </label>
+          <label>Date <input type="date" id="remindDate"></label>
+          <label>Working with <span class="opt">(optional)</span> <input type="text" id="remindWith" placeholder="e.g. Tom, Anna"></label>
+        </div>
+        <div class="math-limit" id="remindHint">Pick a type above, then fill in at least one detail.</div>
+        <button class="math-btn" id="remindAddBtn">Save Reminder</button>
+      </div>
+
+      <div class="card">
+        <h2>Upcoming</h2>
+        <div id="remindList"></div>
+        <div class="remind-share-row">
+          <button class="math-btn secondary" id="remindShareBtn">Share with a parent</button>
+        </div>
+        <div class="math-summary" id="remindSummary"></div>
+        <textarea id="remindShareText" class="remind-share-text" readonly rows="4" style="display:none;"></textarea>
+      </div>
+    </section>
+
+    <!-- SOS -->
+    <section class="screen" id="screen-sos">
+      <div class="card sos-card">
+        <div class="sos-head">
+          <div class="sos-icon-wrap" id="sosIconWrap"></div>
+          <h2>Mission Control</h2>
+        </div>
+        <div class="sub">Not sure what's going on? Tap what's happening — there's no wrong answer.</div>
+        <div id="situationList"></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button data-screen="today" class="active">
+      <span class="nav-icon" data-nav-icon="today"></span>
+      Today
+    </button>
+    <button data-screen="say">
+      <span class="nav-icon" data-nav-icon="say"></span>
+      Say This
+    </button>
+    <button data-screen="group">
+      <span class="nav-icon" data-nav-icon="group"></span>
+      Group
+    </button>
+    <button data-screen="check">
+      <span class="nav-icon" data-nav-icon="check"></span>
+      Check
+    </button>
+    <button data-screen="math">
+      <span class="nav-icon" data-nav-icon="math"></span>
+      Math
+    </button>
+    <button data-screen="remind">
+      <span class="nav-icon" data-nav-icon="remind"></span>
+      Remind
+    </button>
+    <button data-screen="xp">
+      <span class="nav-icon" data-nav-icon="xp"></span>
+      XP
+    </button>
+    <button data-screen="sos" class="sos-tab">
+      <span class="nav-icon" data-nav-icon="sos"></span>
+      Help
+    </button>
+  </nav>
+
+  <div id="overlay">
+    <div class="ov-close" id="ovClose">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" fill="none" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </div>
+    <div class="ov-text" id="ovText"></div>
+    <div class="ov-timer" id="ovTimer"></div>
+    <div class="ov-hint">Tap anywhere to close</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
+
+  // Builds an 8-bit style sprite from a row of pixel-grid strings.
+  // Each character maps to a hex color in `pal`; '.' is transparent.
+  function px(rows, pal){
+    const h = rows.length, w = rows[0].length;
+    let rects = '';
+    for(let y = 0; y < h; y++){
+      for(let x = 0; x < w; x++){
+        const c = rows[y][x];
+        if(c !== '.' && pal[c]){
+          rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${pal[c]}"/>`;
+        }
+      }
+    }
+    return `<svg viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges">${rects}</svg>`;
+  }
+
+  const GOLD = '#F5C542', GOLD_DK = '#F5A623', RED = '#E4453D', RED_DK = '#C62828',
+        BLUE = '#1E4FA3', GREEN = '#4CAF50', WHITE = '#FFFFFF', PURPLE = '#9B59B6',
+        PINK = '#FF6FA5', BROWN = '#A9744F', GRAY = '#8A8A8A', INK = '#16233F', ORANGE = '#F5A623';
+
+  const ICONS = {
+    wave: px([
+      "..a.a.a.","..a.a.a.","aaaaaaa.","aaaaaaa.",
+      ".aaaaaa.",".aaaaaa.",".bbbbbb.",".bbbbbb."
+    ], {a:'#F2954D', b:BLUE}),
+    question: px([
+      ".aaaaa..","aa...aa.","....aa..","...aa...",
+      "..aa....","..aa....","........","..aa...."
+    ], {a:PURPLE}),
+    idea: px([
+      "..aaaa..",".aaaaaa.","aaaaaaaa","aaaaaaaa",
+      ".aaaaaa.","..bbbb..","..bbbb..","...bb..."
+    ], {a:GOLD, b:GRAY}),
+    heart: px([
+      ".aa.aa..","aaaaaaa.","aaaaaaaa",".aaaaaa.",
+      "..aaaa..","...aa...","........","........"
+    ], {a:RED}),
+    flag: px([
+      "a.......","abbbbbb.","abbbbbb.","abbbb...",
+      "a.......","a.......","a.......","aaa....."
+    ], {a:GRAY, b:RED}),
+    star: px([
+      "...aa...","...aa...",".a.aa.a.","aaaaaaaa",
+      ".a.aa.a.","...aa...","...aa...","........"
+    ], {a:GOLD}),
+    medal: px([
+      "..aaaa..",".aaaaaa.","aabbbbaa","aabbbbaa",
+      "aabbbbaa",".aaaaaa.","..cc.cc.",".c....c."
+    ], {a:GOLD, b:RED, c:RED_DK}),
+    gift: px([
+      "........","..a..a..","bbbccbbb","bbbccbbb",
+      "bbbccbbb","bbbccbbb","bbbccbbb","........"
+    ], {a:GOLD, b:WHITE, c:GOLD}),
+    rocket: px([
+      "...aa...","..aaaa..",".aabbaa.",".aabbaa.",
+      ".aaaaaa.","aaaaaaaa",".c....c.","..c..c.."
+    ], {a:WHITE, b:BLUE, c:RED}),
+    moon: px([
+      "..aaaa..",".aaaaaa.","aaaaaaaa","aaaaaaaa",
+      "aaaaaaaa","aaaaaaaa",".aaaaaa.","..aaaa.."
+    ], {a:'#F0EFC9'}),
+    coin: px([
+      "..aaaa..",".aabbaa.","aabbbbaa","aabbbbaa",
+      "aabbbbaa","aabbbbaa",".aabbaa.","..aaaa.."
+    ], {a:GOLD_DK, b:GOLD}),
+    eye: px([
+      "cccccccc","cbbbbbbc","cbaaaabc","cbbbbbbc",
+      "cba..abc","cbbbbbbc","cccccccc","........"
+    ], {a:WHITE, b:'#1F6B4A', c:BROWN}),
+    smile: px([
+      "..aaaa..",".aaaaaa.","aacaacaa","aaaaaaaa",
+      "aacaacaa","aaccccaa",".aaaaaa.","..aaaa.."
+    ], {a:GOLD, c:INK}),
+    megaphone: px([
+      "aaa.....","aaaa....","aaaaa...","aaaaaa..",
+      "aaaaaa..","aaaaa...","aaaa....","aaa....."
+    ], {a:ORANGE}),
+    clock: px([
+      "..aaaa..",".aaabaa.","aaaabaaa","aaaaaaaa",
+      "aaaaabba","aaaaaaaa",".aaaaaa.","..aaaa.."
+    ], {a:WHITE, b:INK}),
+    agree: px([
+      "........","......a.",".....aa.","....aa..",
+      "aa.aa...",".aaa....","..a.....","........"
+    ], {a:GREEN}),
+    marker: px([
+      ".....aa.","....aa..","...aa...","..aa....",
+      ".aa.....","aa......","a.......","........"
+    ], {a:GOLD}),
+    stairs: px([
+      "......aa","......aa","....aaaa","....aaaa",
+      "..aaaaaa","..aaaaaa","aaaaaaaa","aaaaaaaa"
+    ], {a:BLUE}),
+    friends: px([
+      ".a...b..","aaa.bbb.",".a...b..","aaa.bbb.",
+      "aaa.bbb.","aaa.bbb.","a.a.b.b.","a.a.b.b."
+    ], {a:BLUE, b:GREEN}),
+    pause: px([
+      ".aa.aa..",".aa.aa..",".aa.aa..",".aa.aa..",
+      ".aa.aa..",".aa.aa..",".aa.aa..","........"
+    ], {a:BLUE}),
+    book: px([
+      "aaabaaa.","aaabaaa.","aaabaaa.",".aabaa..",
+      ".aabaa..","..aba...","........","........"
+    ], {a:GOLD, b:BLUE}),
+    exit: px([
+      ".aaaaa..",".a...a..",".a...a..",".a..ba..",
+      ".a...a..",".a...a..",".aaaaa..","........"
+    ], {a:BROWN, b:GOLD}),
+    brain: px([
+      ".aa.aa..","aaaaaaa.","aa.a.aa.","aaaaaaa.",
+      "aa.a.aa.",".aaaaa..","..aaa...","........"
+    ], {a:PINK}),
+    sunrise: px([
+      "a.....a.",".aaaaa..","aaaaaaaa","aaaaaaaa",
+      "bbbbbbbb","........","........","........"
+    ], {a:GOLD, b:'#3F7D3A'}),
+    speech: px([
+      "aaaaaaa.","aaaaaaa.","aaaaaaa.","aaaaaaa.",
+      "aa.aa...","a.......","........","........"
+    ], {a:BLUE}),
+    clipboard: px([
+      "aaaaaaa.","aaaaaaa.","aaaaaaa.","aa.b.aa.",
+      "aab.baa.","aaaaaaa.","aaaaaaa.","........"
+    ], {a:WHITE, b:GREEN}),
+    chest: px([
+      ".aaaaaa.","aaaaaaaa","aaaaaaaa","bbbbbbbb",
+      "bb.cc.bb","bbbbbbbb","bbbbbbbb","........"
+    ], {a:GOLD, b:BROWN, c:GOLD_DK}),
+    abacus: px([
+      "aaaaaaaa","a......a","a.b..c.a","a......a",
+      "a.c..b.a","a......a","aaaaaaaa","........"
+    ], {a:BROWN, b:GOLD, c:RED}),
+    bell: px([
+      "..aaaa..",".aaaaaa.",".aaaaaa.",".aaaaaa.",
+      "aaaaaaaa","...bb...","........","........"
+    ], {a:GOLD, b:BROWN})
+  };
+
+  const NAV_ICONS = {
+    today: ICONS.sunrise, say: ICONS.speech, group: ICONS.friends,
+    check: ICONS.agree, math: ICONS.abacus, remind: ICONS.bell,
+    xp: ICONS.star, sos: ICONS.chest
+  };
+
+  function renderNavIcons(){
+    document.querySelectorAll('[data-nav-icon]').forEach(el => {
+      el.innerHTML = NAV_ICONS[el.dataset.navIcon] || '';
+    });
+  }
+
+  /* ===== MATH NOTES ===== */
+  function initMathTools(){
+    // Sub-tab switching
+    document.querySelectorAll('.math-subtab').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.math-subtab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.math-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        el('math-' + btn.dataset.math).classList.add('active');
+      };
+    });
+
+    /* --- Cross It Out --- */
+    let counters = [false, false, false, false, false];
+    function renderCounters(){
+      const wrap = el('counterGrid');
+      wrap.innerHTML = '';
+      counters.forEach((crossed, i) => {
+        const c = document.createElement('div');
+        c.className = 'counter' + (crossed ? ' crossed' : '');
+        c.textContent = i + 1;
+        c.onclick = () => { counters[i] = !counters[i]; renderCounters(); };
+        wrap.appendChild(c);
+      });
+      const crossedCount = counters.filter(Boolean).length;
+      el('counterSummary').textContent =
+        `Total: ${counters.length}  ·  Crossed out: ${crossedCount}  ·  Left: ${counters.length - crossedCount}`;
+    }
+    el('counterSetBtn').onclick = () => {
+      const n = Math.max(0, Math.min(50, parseInt(el('counterStartInput').value) || 0));
+      counters = Array(n).fill(false);
+      renderCounters();
+    };
+    el('counterAddBtn').onclick = () => { counters.push(false); renderCounters(); };
+    el('counterResetBtn').onclick = () => { counters = []; renderCounters(); };
+    renderCounters();
+
+    /* --- Number Line --- */
+    let nl = {start: 0, end: 10, current: null};
+    function drawNumberLine(jumpArc){
+      const {start, end} = nl;
+      const range = end - start;
+      if(!(range > 0)) return;
+      const W = 320, H = 140, marginX = 24, y = 90;
+      const usableW = W - marginX * 2;
+      const stepPx = usableW / range;
+      let ticks = '', labels = '';
+      for(let v = start; v <= end; v++){
+        const x = marginX + (v - start) * stepPx;
+        ticks += `<line x1="${x}" y1="${y-8}" x2="${x}" y2="${y+8}" stroke="#7A6A52" stroke-width="1.5"/>`;
+        labels += `<text x="${x}" y="${y+26}" font-size="11" text-anchor="middle" fill="#7A6A52">${v}</text>`;
+        ticks += `<circle class="nl-hit" data-v="${v}" cx="${x}" cy="${y}" r="13" fill="transparent"/>`;
+      }
+      let marker = '';
+      if(nl.current != null){
+        const cx = marginX + (nl.current - start) * stepPx;
+        marker = `<circle cx="${cx}" cy="${y}" r="6" fill="#C1502B"/>`;
+      }
+      let arc = '';
+      if(jumpArc){
+        const x1 = marginX + (jumpArc.from - start) * stepPx;
+        const x2 = marginX + (jumpArc.to - start) * stepPx;
+        const mx = (x1 + x2) / 2;
+        const diff = jumpArc.to - jumpArc.from;
+        arc = `<path d="M ${x1} ${y} Q ${mx} ${y-32} ${x2} ${y}" stroke="#3F7D3A" stroke-width="2.5" fill="none" marker-end="url(#nlArrow)"/>
+               <text x="${mx}" y="${y-38}" font-size="13" font-weight="700" text-anchor="middle" fill="#3F7D3A">${diff>0?'+':''}${diff}</text>`;
+      }
+      const svg = `<svg viewBox="0 0 ${W} ${H}">
+        <defs><marker id="nlArrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F7D3A"/></marker></defs>
+        <line x1="${marginX}" y1="${y}" x2="${W-marginX}" y2="${y}" stroke="#7A6A52" stroke-width="2"/>
+        ${arc}${ticks}${labels}${marker}
+      </svg>`;
+      el('nlSvgWrap').innerHTML = svg;
+      el('nlSvgWrap').querySelectorAll('.nl-hit').forEach(c => {
+        c.style.cursor = 'pointer';
+        c.addEventListener('click', () => handleNlTap(parseInt(c.dataset.v)));
+      });
+    }
+    function handleNlTap(v){
+      if(nl.current == null){
+        nl.current = v;
+        drawNumberLine();
+        el('nlSummary').textContent = `Starting point: ${v}. Tap another number to jump.`;
+      } else {
+        const from = nl.current;
+        nl.current = v;
+        drawNumberLine({from, to: v});
+        const diff = v - from;
+        el('nlSummary').textContent = `Jump: ${from} to ${v}  (${diff>0?'+':''}${diff})`;
+      }
+    }
+    el('nlBuildBtn').onclick = () => {
+      const start = parseInt(el('nlStart').value);
+      const end = parseInt(el('nlEnd').value);
+      if(isNaN(start) || isNaN(end) || start < -200 || end > 200){
+        el('nlSummary').textContent = 'From and To must be between -200 and 200.';
+        return;
+      }
+      if(end <= start || (end - start) > 40){
+        el('nlSummary').textContent = 'Pick a From and To where To is bigger (up to 40 apart).';
+        return;
+      }
+      nl = {start, end, current: null};
+      el('nlSummary').textContent = 'Tap a number to start.';
+      drawNumberLine();
+    };
+    el('nlClearBtn').onclick = () => {
+      nl.current = null;
+      el('nlSummary').textContent = '';
+      drawNumberLine();
+    };
+    drawNumberLine();
+
+    /* --- Fraction Pies --- */
+    function pieSVG(slices, shaded){
+      slices = Math.max(1, Math.min(12, slices));
+      shaded = Math.max(0, Math.min(slices, shaded));
+      const cx = 60, cy = 60, r = 54;
+      let paths = '';
+      for(let i = 0; i < slices; i++){
+        const a0 = (i / slices) * 2 * Math.PI - Math.PI / 2;
+        const a1 = ((i + 1) / slices) * 2 * Math.PI - Math.PI / 2;
+        const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+        const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+        const largeArc = (a1 - a0) > Math.PI ? 1 : 0;
+        const fill = i < shaded ? '#F5A623' : '#FFFBF0';
+        paths += `<path d="M${cx},${cy} L${x0},${y0} A${r},${r} 0 ${largeArc} 1 ${x1},${y1} Z" fill="${fill}" stroke="#3B2A1E" stroke-width="1.5"/>`;
+      }
+      return `<svg viewBox="0 0 120 120">${paths}</svg>`;
+    }
+    let pieIdCounter = 0;
+    function addPieBlock(){
+      const id = 'pie-' + (pieIdCounter++);
+      const wrap = document.createElement('div');
+      wrap.className = 'pie-block';
+      wrap.id = id;
+      wrap.innerHTML = `
+        <div class="pie-block-head">
+          <div class="math-controls" style="margin-bottom:0;">
+            <label>Slices <input type="number" class="pieSlices" value="4" min="1" max="12"></label>
+            <label>Shaded <input type="number" class="pieShaded" value="1" min="0"></label>
+          </div>
+          <button class="pie-remove">Remove</button>
+        </div>
+        <div class="pie-display">
+          <div class="pie-svg"></div>
+          <div class="pie-fraction"></div>
+        </div>`;
+      el('pieList').appendChild(wrap);
+      const slicesInput = wrap.querySelector('.pieSlices');
+      const shadedInput = wrap.querySelector('.pieShaded');
+      const svgHolder = wrap.querySelector('.pie-svg');
+      const fracHolder = wrap.querySelector('.pie-fraction');
+      function update(){
+        const s = parseInt(slicesInput.value) || 1;
+        const sh = parseInt(shadedInput.value) || 0;
+        svgHolder.innerHTML = pieSVG(s, sh);
+        fracHolder.textContent = Math.min(sh,s) + ' / ' + s;
+      }
+      slicesInput.oninput = update;
+      shadedInput.oninput = update;
+      wrap.querySelector('.pie-remove').onclick = () => wrap.remove();
+      update();
+    }
+    el('pieAddBtn').onclick = addPieBlock;
+    addPieBlock();
+
+    /* --- Angle --- */
+    function drawAngle(){
+      const deg = Math.max(0, Math.min(360, parseFloat(el('angleDeg').value) || 0));
+      const W = 220, H = 180, cx = 30, cy = 150, len = 165;
+      const rad = deg * Math.PI / 180;
+      const x2 = cx + len * Math.cos(rad), y2 = cy - len * Math.sin(rad);
+      const arcR = 32;
+      const ax1 = cx + arcR, ay1 = cy;
+      const ax2 = cx + arcR * Math.cos(rad), ay2 = cy - arcR * Math.sin(rad);
+      const largeArc = deg > 180 ? 1 : 0;
+      const midRad = rad / 2;
+      const labelX = cx + (arcR + 18) * Math.cos(midRad);
+      const labelY = cy - (arcR + 18) * Math.sin(midRad);
+      const svg = `<svg viewBox="0 0 ${W} ${H}">
+        <line x1="${cx}" y1="${cy}" x2="${cx+len}" y2="${cy}" stroke="#3B2A1E" stroke-width="2.5"/>
+        <line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#3B2A1E" stroke-width="2.5"/>
+        <path d="M ${ax1} ${ay1} A ${arcR} ${arcR} 0 ${largeArc} 0 ${ax2} ${ay2}" stroke="#C1502B" stroke-width="2" fill="none"/>
+        <text x="${labelX}" y="${labelY}" font-size="14" font-weight="700" fill="#C1502B" text-anchor="middle">${deg}°</text>
+        <circle cx="${cx}" cy="${cy}" r="3.5" fill="#3B2A1E"/>
+      </svg>`;
+      el('angleSvgWrap').innerHTML = svg;
+    }
+    el('angleDeg').oninput = drawAngle;
+    drawAngle();
+
+    /* --- Shape --- */
+    function updateShapeInputs(){
+      const type = el('shapeType').value;
+      const wLabel = document.querySelector('.shape-w');
+      wLabel.style.display = (type === 'rect' || type === 'square') ? '' : 'none';
+      wLabel.firstChild.textContent = (type === 'square') ? 'Side ' : 'Width ';
+      document.querySelector('.shape-h').style.display = (type === 'rect') ? '' : 'none';
+      document.querySelector('.shape-base').style.display = (type === 'triangle') ? '' : 'none';
+      document.querySelector('.shape-h2').style.display = (type === 'triangle') ? '' : 'none';
+      document.querySelector('.shape-r').style.display = (type === 'circle') ? '' : 'none';
+    }
+    function drawShape(){
+      const type = el('shapeType').value;
+      const W = 280, H = 170;
+      let svg = '';
+      if(type === 'rect' || type === 'square'){
+        const w = Math.max(1, Math.min(200, parseFloat(el('shapeW').value) || 1));
+        const h = type === 'square' ? w : Math.max(1, Math.min(200, parseFloat(el('shapeH').value) || 1));
+        const scale = Math.min(200 / w, 110 / h);
+        const rw = w * scale, rh = h * scale;
+        const x = (W - rw) / 2, y = (H - rh) / 2;
+        svg = `<svg viewBox="0 0 ${W} ${H}">
+          <rect x="${x}" y="${y}" width="${rw}" height="${rh}" fill="rgba(63,125,58,0.15)" stroke="#3F7D3A" stroke-width="2.5"/>
+          <text x="${x+rw/2}" y="${y-10}" font-size="13" text-anchor="middle" fill="#3B2A1E">${w}</text>
+          ${type==='rect' ? `<text x="${x-16}" y="${y+rh/2}" font-size="13" text-anchor="middle" fill="#3B2A1E" transform="rotate(-90 ${x-16} ${y+rh/2})">${h}</text>` : ''}
+        </svg>`;
+      } else if(type === 'triangle'){
+        const b = Math.max(1, Math.min(200, parseFloat(el('shapeBase').value) || 1));
+        const h = Math.max(1, Math.min(200, parseFloat(el('shapeH2').value) || 1));
+        const scale = Math.min(200 / b, 110 / h);
+        const bw = b * scale, bh = h * scale;
+        const baseY = (H + bh) / 2;
+        const x0 = (W - bw) / 2, topX = x0 + bw / 2, topY = baseY - bh;
+        svg = `<svg viewBox="0 0 ${W} ${H}">
+          <polygon points="${x0},${baseY} ${x0+bw},${baseY} ${topX},${topY}" fill="rgba(63,125,58,0.15)" stroke="#3F7D3A" stroke-width="2.5"/>
+          <line x1="${topX}" y1="${topY}" x2="${topX}" y2="${baseY}" stroke="#C1502B" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="${x0+bw/2}" y="${baseY+18}" font-size="13" text-anchor="middle" fill="#3B2A1E">base ${b}</text>
+          <text x="${topX+8}" y="${(topY+baseY)/2}" font-size="13" fill="#C1502B">height ${h}</text>
+        </svg>`;
+      } else if(type === 'circle'){
+        const r = Math.max(1, Math.min(100, parseFloat(el('shapeR').value) || 1));
+        const scale = Math.min(75 / r, 75 / r);
+        const rr = r * scale;
+        const cx = W / 2, cy = H / 2;
+        svg = `<svg viewBox="0 0 ${W} ${H}">
+          <circle cx="${cx}" cy="${cy}" r="${rr}" fill="rgba(63,125,58,0.15)" stroke="#3F7D3A" stroke-width="2.5"/>
+          <line x1="${cx}" y1="${cy}" x2="${cx+rr}" y2="${cy}" stroke="#C1502B" stroke-width="1.5"/>
+          <text x="${cx+rr/2}" y="${cy-6}" font-size="13" text-anchor="middle" fill="#C1502B">r = ${r}</text>
+        </svg>`;
+      }
+      el('shapeSvgWrap').innerHTML = svg;
+    }
+    el('shapeType').onchange = () => { updateShapeInputs(); drawShape(); };
+    ['shapeW','shapeH','shapeBase','shapeH2','shapeR'].forEach(id => { el(id).oninput = drawShape; });
+    updateShapeInputs();
+    drawShape();
+
+    /* --- HTO Column Method --- */
+    // Internal digit order is [Ones, Tens, Hundreds] for easy right-to-left processing.
+    function toDigits(n){
+      n = Math.max(0, Math.min(999, Math.floor(n) || 0));
+      return [n % 10, Math.floor(n / 10) % 10, Math.floor(n / 100) % 10];
+    }
+    function leadingMask(d){
+      const mask = [true, true, true];
+      if(d[2] === 0){ mask[2] = false; if(d[1] === 0){ mask[1] = false; } }
+      return mask;
+    }
+    function htoRow(cells, rowClass){
+      return `<div class="hto-row ${rowClass||''}">` +
+        cells.map(c => `<div class="hto-cell ${c.cls||''}">${c.text !== undefined ? c.text : ''}</div>`).join('') +
+        `</div>`;
+    }
+    function renderHTOTable(topD, botD, work, reduced, gained, result, op, highlight){
+      const labels = ['O','T','H'];
+      const dispOrder = [2,1,0]; // H, T, O left to right
+      const topMask = leadingMask(topD);
+      const botMask = leadingMask(botD);
+
+      let html = '<div class="hto-grid">';
+      html += htoRow([{cls:'hto-margin'}, ...dispOrder.map(i => ({text: labels[i]}))], 'hto-header');
+
+      html += htoRow([{cls:'hto-margin'}, ...dispOrder.map(i => {
+        let mark = '';
+        if(op === '−'){
+          if(gained[i]) mark = '+10';
+          else if(reduced[i]) mark = String(work[i]);
+        } else if(gained[i]){
+          mark = '+1';
+        }
+        return {text: mark};
+      })], 'hto-annot');
+
+      html += htoRow([{cls:'hto-margin'}, ...dispOrder.map(i => {
+        const strike = (op === '−' && (reduced[i] || gained[i]));
+        return {text: topMask[i] ? topD[i] : '', cls: strike ? 'hto-strike' : ''};
+      })], 'hto-topnum');
+
+      html += htoRow([{text: op, cls:'hto-margin hto-op'}, ...dispOrder.map(i => ({text: botMask[i] ? botD[i] : ''}))], 'hto-botnum');
+
+      html += `<div class="hto-rule-row"><div></div><div class="hto-rule"></div><div class="hto-rule"></div><div class="hto-rule"></div></div>`;
+
+      html += htoRow([{cls:'hto-margin'}, ...dispOrder.map(i => ({text: result[i], cls: highlight[i] ? 'hto-highlight' : ''}))], 'hto-result');
+
+      html += '</div>';
+      el('htoTableWrap').innerHTML = html;
+    }
+    function computeHTO(){
+      const op = el('htoOp').value;
+      const topVal = Math.max(0, Math.min(999, parseInt(el('htoTop').value) || 0));
+      const botVal = Math.max(0, Math.min(999, parseInt(el('htoBottom').value) || 0));
+      const topD = toDigits(topVal);
+      const botD = toDigits(botVal);
+
+      if(op === 'sub'){
+        if(topVal < botVal){
+          el('htoTableWrap').innerHTML = '';
+          el('htoSummary').textContent = 'The top number needs to be equal to or bigger than the bottom number.';
+          return;
+        }
+        const work = topD.slice();
+        const reduced = [false,false,false];
+        const gained = [false,false,false];
+        const result = [0,0,0];
+        for(let i = 0; i < 3; i++){
+          if(work[i] < botD[i]){
+            let j = i + 1;
+            while(j < 3 && work[j] === 0){
+              work[j] = 9;
+              reduced[j] = true;
+              j++;
+            }
+            if(j < 3){
+              work[j] -= 1;
+              reduced[j] = true;
+            }
+            work[i] += 10;
+            gained[i] = true;
+          }
+          result[i] = work[i] - botD[i];
+        }
+        const highlight = [0,1,2].map(i => reduced[i] || gained[i]);
+        renderHTOTable(topD, botD, work, reduced, gained, result, '−', highlight);
+        el('htoSummary').textContent = `${topVal} − ${botVal} = ${result[2]*100 + result[1]*10 + result[0]}`;
+      } else {
+        if(topVal + botVal > 999){
+          el('htoTableWrap').innerHTML = '';
+          el('htoSummary').textContent = 'Keep the total under 1000 for this table.';
+          return;
+        }
+        const gained = [false,false,false]; // received a carry from the right
+        const result = [0,0,0];
+        let carry = 0;
+        for(let i = 0; i < 3; i++){
+          if(carry) gained[i] = true;
+          const sum = topD[i] + botD[i] + carry;
+          if(sum >= 10){ result[i] = sum - 10; carry = 1; } else { result[i] = sum; carry = 0; }
+        }
+        renderHTOTable(topD, botD, topD, [false,false,false], gained, result, '+', gained);
+        el('htoSummary').textContent = `${topVal} + ${botVal} = ${result[2]*100 + result[1]*10 + result[0]}`;
+      }
+    }
+    el('htoBuildBtn').onclick = computeHTO;
+    computeHTO();
+  }
+
+  /* ===== REMINDERS ===== */
+  const REMIND_LABELS = {bring:'Bring', presentation:'Presentation', test:'Test', group:'Group work'};
+
+  function escapeHTML(s){
+    const d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+  }
+  function formatFriendlyDate(dateStr){
+    if(!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    if(isNaN(d)) return dateStr;
+    return d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+  }
+  async function saveReminders(){
+    await saveJSON('reminders', state.reminders);
+  }
+  function renderReminders(){
+    const list = state.reminders.slice().sort((a,b) => (a.date||'9999-99-99').localeCompare(b.date||'9999-99-99'));
+    const wrap = el('remindList');
+    wrap.innerHTML = '';
+    if(list.length === 0){
+      wrap.innerHTML = '<div class="remind-empty">No reminders yet — add one above.</div>';
+      return;
+    }
+    const todayD = todayStr();
+    list.forEach(r => {
+      const isOverdue = !r.done && r.date && r.date < todayD;
+      const row = document.createElement('div');
+      row.className = 'remind-row' + (r.done ? ' done' : '') + (isOverdue ? ' overdue' : '');
+      const typeLabel = REMIND_LABELS[r.type] || 'Reminder';
+      const metaParts = [];
+      if(r.class) metaParts.push(escapeHTML(r.class));
+      if(r.date) metaParts.push(formatFriendlyDate(r.date));
+      if(r.withNames) metaParts.push('with ' + escapeHTML(r.withNames));
+      row.innerHTML = `
+        <div class="remind-check ${r.done?'done':''}">${CHECK_SVG}</div>
+        <div class="remind-info">
+          <div class="remind-title">${typeLabel}${r.what ? ': ' + escapeHTML(r.what) : ''}</div>
+          <div class="remind-meta">${metaParts.join(' · ')}</div>
+        </div>
+        <button class="remind-del">×</button>`;
+      row.querySelector('.remind-check').onclick = async () => {
+        r.done = !r.done;
+        await saveReminders();
+        renderReminders();
+      };
+      row.querySelector('.remind-del').onclick = async () => {
+        state.reminders = state.reminders.filter(x => x.id !== r.id);
+        await saveReminders();
+        renderReminders();
+      };
+      wrap.appendChild(row);
+    });
+  }
+
+  function initReminders(){
+    let selectedType = 'bring';
+    const chips = document.querySelectorAll('.remind-type-chip');
+    chips.forEach(chip => {
+      if(chip.dataset.type === selectedType) chip.classList.add('selected');
+      chip.onclick = () => {
+        chips.forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        selectedType = chip.dataset.type;
+      };
+    });
+
+    el('remindClass').onchange = () => {
+      el('remindClassOtherWrap').style.display = (el('remindClass').value === '__other') ? '' : 'none';
+    };
+
+    function getClassValue(){
+      const sel = el('remindClass').value;
+      return sel === '__other' ? el('remindClassOther').value.trim() : sel;
+    }
+
+    el('remindAddBtn').onclick = async () => {
+      const what = el('remindWhat').value.trim();
+      const cls = getClassValue();
+      const date = el('remindDate').value;
+      const withNames = el('remindWith').value.trim();
+      if(!what && !cls && !date){
+        el('remindHint').textContent = "Fill in at least one detail — what, class, or a date.";
+        return;
+      }
+      state.reminders.push({
+        id: 'r' + Date.now(), type: selectedType, what, class: cls, date, withNames, done: false
+      });
+      await saveReminders();
+      renderReminders();
+      el('remindWhat').value = '';
+      el('remindClass').value = '';
+      el('remindClassOther').value = '';
+      el('remindClassOtherWrap').style.display = 'none';
+      el('remindDate').value = '';
+      el('remindWith').value = '';
+      el('remindHint').textContent = 'Saved. Add another, or share the list below.';
+    };
+
+    el('remindShareBtn').onclick = async () => {
+      const active = state.reminders.filter(r => !r.done)
+        .slice().sort((a,b) => (a.date||'9999-99-99').localeCompare(b.date||'9999-99-99'));
+      if(active.length === 0){
+        el('remindSummary').textContent = 'No reminders to share yet.';
+        el('remindShareText').style.display = 'none';
+        return;
+      }
+      const lines = active.map(r => {
+        const parts = [REMIND_LABELS[r.type] || 'Reminder'];
+        if(r.what) parts.push(r.what);
+        if(r.class) parts.push('for ' + r.class);
+        if(r.date) parts.push('on ' + formatFriendlyDate(r.date));
+        if(r.withNames) parts.push('with ' + r.withNames);
+        return '- ' + parts.join(' ');
+      });
+      const text = "J.J.'s reminders:\n" + lines.join('\n');
+
+      if(navigator.share){
+        try{
+          await navigator.share({title: "J.J.'s Reminders", text});
+          el('remindSummary').textContent = '';
+          el('remindShareText').style.display = 'none';
+          return;
+        }catch(e){ /* cancelled — fall through to showing the text */ }
+      }
+      const box = el('remindShareText');
+      box.value = text;
+      box.style.display = 'block';
+      try{
+        await navigator.clipboard.writeText(text);
+        el('remindSummary').textContent = 'Copied! Paste it into LINE or Messages to send.';
+      }catch(e){
+        el('remindSummary').textContent = 'Tap the text below and copy it to send.';
+        box.focus();
+        box.select();
+      }
+    };
+
+    renderReminders();
+  }
+
+  const SCENERY = {
+    tree: px([
+      "...aa...","..aaaaa.",".aaaaaaa","..aaaaa.",
+      ".aaaaaaa","..aaaaa.","...bb...","...bb..."
+    ], {a:'#3F7D3A', b:'#8B5A2B'}),
+    treeDark: px([
+      "...aa...","..aaaaa.",".aaaaaaa","..aaaaa.",
+      ".aaaaaaa","..aaaaa.","...bb...","...bb..."
+    ], {a:'#2E5F2C', b:'#6E4522'}),
+    bush: px([
+      "........","..aaaa..",".aaaaaa.","aaaaaaaa",
+      "aaaaaaaa",".aaaaaa.","........","........"
+    ], {a:'#5FA84A'}),
+    rabbit: px([
+      ".a....a.",".a....a.","..aaaa..",".aaaaaa.",
+      "aaaaaaaa","aaaaaaaa",".aa..aa.","........"
+    ], {a:'#F5EFE0'})
+  };
+
+  function renderScene(){
+    const scene = document.getElementById('scene');
+    if(!scene) return;
+    const items = [
+      {icon:'tree', left:'4%',  top:'14%', size:34},
+      {icon:'bush', left:'14%', top:'24%', size:20},
+      {icon:'treeDark', left:'80%', top:'10%', size:40},
+      {icon:'tree', left:'90%', top:'20%', size:26},
+      {icon:'bush', left:'60%', top:'22%', size:18},
+      {icon:'rabbit', left:'34%', top:'26%', size:18}
+    ];
+    scene.innerHTML = items.map(it =>
+      `<div style="position:absolute; left:${it.left}; top:${it.top}; width:${it.size}px; height:${it.size}px;">${SCENERY[it.icon]}</div>`
+    ).join('');
+  }
+
+  const XP_ACTIONS = [
+    {id:'hello', label:'Say Hello', xp:5, icon:'wave'},
+    {id:'question', label:'Ask Question', xp:10, icon:'question'},
+    {id:'opinion', label:'One Opinion', xp:15, icon:'idea'},
+    {id:'help', label:'Help Friend', xp:20, icon:'heart'},
+    {id:'group', label:'Finish Group Work', xp:20, icon:'flag'},
+    {id:'praise', label:'Teacher Praised', xp:50, icon:'star'}
+  ];
+
+  function mondayKey(){
+    const d = new Date();
+    const day = d.getDay();
+    const diff = (day === 0 ? -6 : 1 - day);
+    d.setDate(d.getDate() + diff);
+    return 'week:' + d.toISOString().slice(0,10);
+  }
+
+  function updateHeaderBadge(){
+    const badge = el('headerBadge');
+    if(state.quietMode){ badge.style.display = 'none'; return; }
+    const mode = badge.dataset.mode;
+    if(mode === 'ladder'){
+      badge.style.display = '';
+      badge.textContent = 'Level ' + state.ladderToday;
+    } else if(mode === 'xp'){
+      badge.style.display = '';
+      badge.textContent = state.xpLifetime + ' XP';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+  function todayKey(base){ return base + ':' + todayStr(); }
+
+  async function loadJSON(key, fallback){
+    try{
+      const r = await window.storage.get(key);
+      return r ? JSON.parse(r.value) : fallback;
+    }catch(e){ return fallback; }
+  }
+  async function saveJSON(key, val){
+    try{ await window.storage.set(key, JSON.stringify(val)); }catch(e){}
+  }
+
+  const MISSIONS = [
+    {id:'hello', text:'Say hi to the teacher', xp:5, icon:'wave'},
+    {id:'ready', text:'Have your book / iPad ready before the bell', xp:5, icon:'book'},
+    {id:'look', text:'Look up when someone is talking', xp:5, icon:'eye'},
+    {id:'keyword', text:'Highlight one keyword in your notes', xp:5, icon:'marker'},
+    {id:'ladder', text:'Try one new level on the ladder', xp:5, icon:'stairs'}
+  ];
+
+  const LADDER = [
+    {n:1, label:'Look', desc:"Look at whoever is talking.", xp:3, icon:'eye'},
+    {n:2, label:'Nod', desc:"Nod when you understand or agree.", xp:3, icon:'agree'},
+    {n:3, label:'Smile', desc:"React a little — show you're listening.", xp:4, icon:'smile'},
+    {n:4, label:'Ask', desc:"Ask one small question.", xp:10, icon:'question'},
+    {n:5, label:'Share one idea', desc:"Say one idea out loud.", xp:15, icon:'idea'},
+    {n:6, label:'Help teammate', desc:"Help someone in your group.", xp:20, icon:'friends'},
+    {n:7, label:'Explain to class', desc:"Explain something to the whole class.", xp:25, icon:'megaphone'}
+  ];
+
+  const SAY_GROUPS = {
+    start: ["I think...", "Maybe we could...", "I have another idea."],
+    respond: ["Good idea.", "That's interesting."],
+    moment: ["I'm not sure.", "Can you repeat that?", "Can you explain that again?"]
+  };
+  const SAY_GROUP_ICONS = {start:'idea', respond:'agree', moment:'pause'};
+
+  const GROUP_STEPS = [
+    {en:"Starting", line:"What should I do?"},
+    {en:"Dividing jobs", options:["I can do research.", "I can write.", "I can present.", "I can organize."]},
+    {en:"When you're done", line:"I'm finished."},
+    {en:"Before you wrap up", line:"Anything else?"}
+  ];
+
+  const CHECK_ITEMS = [
+    {id:'hand', en:'Raise hand once', xp:10, icon:'wave'},
+    {id:'ask', en:'Ask 1 question', xp:10, icon:'question'},
+    {id:'help', en:'Help a friend once', xp:10, icon:'friends'},
+    {id:'submit', en:'Submit work on time', xp:10, icon:'clock'},
+    {id:'look', en:'Look at teacher while explaining', xp:10, icon:'eye'}
+  ];
+
+  const SOS_PHRASES = [
+    "I don't understand.",
+    "Can you explain?",
+    "Can you help me?",
+    "I need one minute.",
+    "I'm thinking.",
+    "Could you repeat?"
+  ];
+
+  const CHECKIN_RESULTS = {
+    bored: {
+      lead: "Your brain may be looking for more to chew on. Try one before you switch:",
+      tryList: ["Draw one diagram.", "Highlight one keyword.", "Ask one question.", "Wait until independent work."]
+    },
+    restless: {
+      lead: "Your body wants to move — that's normal. Try one of these first:",
+      tryList: ["Stretch your legs under the desk.", "Take three slow breaths.", "Roll your shoulders.", "Ask for a water break."]
+    },
+    confused: {
+      lead: "That's exactly what this app is for. Try saying:",
+      phrases: ["I don't understand.", "Can you explain?", "Can you help me?", "Could you repeat?"]
+    },
+    finished: {
+      lead: "Finishing early happens sometimes. Here are a few things you could try instead of switching off:",
+      tryList: ["Ask if you can help a friend.", "Read back over your work.", "Write one extra note.", "Ask the teacher what's next."]
+    }
+  };
+
+  const SITUATIONS = [
+    {
+      id:'idea', icon:'idea', label:"I have an idea, but I don't know what to say",
+      blocks:[
+        {type:'brain', text:"Your idea is already there — it just needs a shape to come out in. Pick how confident you feel, then finish the sentence."},
+        {type:'phrases', title:'Pick a starter', items:["I think ", "I think... but I'm not totally sure. ", "In my opinion, "]}
+      ]
+    },
+    {
+      id:'tease', icon:'friends', label:"I want to join in, but I'm scared friends will tease me",
+      blocks:[
+        {type:'brain', text:"That fear is your brain trying to protect you. Most people are far more focused on themselves than on judging you — and you don't have to jump straight to talking."},
+        {type:'phrases', title:'Try a small, safe line', items:["What do you think?", "I can help.", "That's a good idea."]}
+      ]
+    },
+    {
+      id:'quit', icon:'pause', label:"I can't do it and I want to quit",
+      blocks:[
+        {type:'brain', text:"Your brain wants an escape because this feels too hard right now. That's a normal reaction — it doesn't mean you can't do it."},
+        {type:'mission', instruction:"Stay for 5 more minutes.", hint:"Choose ONE:", choices:["Ask one question", "Write one note", "Find one interesting fact"]},
+        {type:'checkin', title:'Still want to quit? Check in with yourself:'}
+      ]
+    },
+    {
+      id:'boring', icon:'question', label:"I think what the teacher says is boring or not right",
+      blocks:[
+        {type:'brain', text:"Feeling bored or disagreeing isn't bad — it can mean you're ready for more, or you have a different idea worth sharing."},
+        {type:'tryList', title:"Don't switch off yet. Try one of these:", items:["Draw one diagram.", "Highlight one keyword.", "Ask one question.", "Wait until independent work."]},
+        {type:'phrases', title:'If you disagree, try saying', items:["Can I share a different view? ", "I see it a bit differently because "]}
+      ]
+    },
+    {
+      id:'read', icon:'book', label:"I want to read other books instead",
+      blocks:[
+        {type:'brain', text:"Wanting to escape into a book usually means this task feels too hard, too boring, or too much right now."},
+        {type:'mission', instruction:"Do one small thing first, then it's okay to ask about reading at break.", hint:"Choose ONE:", choices:["Ask one question", "Write one note", "Find one interesting fact", "Set a 5-minute goal"]}
+      ]
+    },
+    {
+      id:'walk', icon:'exit', label:"I want to walk away from class",
+      blocks:[
+        {type:'brain', text:"Wanting to leave is your body's alarm turning up loud. It doesn't always mean something is actually wrong."},
+        {type:'tryList', title:'Try these first', items:["Stretch your legs under the desk.", "Take three slow breaths.", "Roll your shoulders.", "Ask for a water break."]},
+        {type:'checkin', title:'Still restless? Check in with yourself:'},
+        {type:'phrases', title:'If you really need to step out, ask', items:["Can I get some water?", "Can I use the bathroom?"]}
+      ]
+    },
+    {
+      id:'friends', icon:'friends', label:"I don't know what to say to friends during group work",
+      blocks:[
+        {type:'brain', text:"You don't need a perfect line — a short one is enough to join in."},
+        {type:'phrases', title:'Try one of these', items:["What do you think?", "I can do the research.", "Can I help?", "That's a good idea."]}
+      ]
+    },
+    {
+      id:'other', icon:'star', label:"Something else — I just need quick words",
+      blocks:[
+        {type:'brain', text:"That's okay. Pick a line, finish it if you want, then show it to your teacher."},
+        {type:'phrases', title:'Quick words', items: SOS_PHRASES}
+      ]
+    }
+  ];
+
+  let state = {
+    missions: {},
+    ladderToday: 0,
+    ladderBest: 0,
+    ladderXPWatermark: 0,
+    checks: {},
+    xpLifetime: 0,
+    xpToday: 0,
+    xpWeek: 0,
+    xpActionsToday: {},
+    quietMode: false,
+    reminders: []
+  };
+
+  const el = id => document.getElementById(id);
+
+  function fmtDate(){
+    const d = new Date();
+    return d.toLocaleDateString('en-US', {weekday:'long', month:'short', day:'numeric'});
+  }
+
+  function renderMissions(){
+    const wrap = el('missionList');
+    wrap.innerHTML = '';
+    MISSIONS.forEach(m => {
+      const done = !!state.missions[m.id];
+      const row = document.createElement('div');
+      row.className = 'mission-row';
+      row.innerHTML = `<div class="row-icon">${ICONS[m.icon]}</div><div class="mission-check ${done?'done':''}">${CHECK_SVG}</div><div class="mission-text ${done?'done':''}">${m.text}</div>`;
+      row.onclick = async () => {
+        const nowDone = !state.missions[m.id];
+        state.missions[m.id] = nowDone;
+        await saveJSON(todayKey('missions'), state.missions);
+        renderMissions();
+        await adjustXP(nowDone ? m.xp : -m.xp);
+        if(nowDone) popFloatXP(row, m.xp);
+      };
+      wrap.appendChild(row);
+    });
+  }
+
+  function renderLadder(){
+    const wrap = el('ladderList');
+    wrap.innerHTML = '';
+    LADDER.forEach(step => {
+      const reached = step.n <= state.ladderToday;
+      const current = step.n === state.ladderToday;
+      const item = document.createElement('div');
+      item.className = 'trail-item';
+      item.innerHTML = `
+        <div class="trail-node ${reached?'reached':''} ${current?'current':''}">${step.n}</div>
+        <div class="trail-label">
+          <div class="name">${ICONS[step.icon]}<span>${step.label}</span></div>
+          <div class="desc">${step.desc}</div>
+        </div>`;
+      item.onclick = async () => {
+        state.ladderToday = (state.ladderToday === step.n) ? step.n - 1 : step.n;
+        if(state.ladderToday > state.ladderBest){
+          state.ladderBest = state.ladderToday;
+          await saveJSON('ladder-best', {v: state.ladderBest});
+        }
+        await saveJSON(todayKey('ladder'), {v: state.ladderToday});
+        renderLadder();
+        updateHeaderBadge();
+
+        if(state.ladderToday > state.ladderXPWatermark){
+          const earned = LADDER
+            .filter(s => s.n > state.ladderXPWatermark && s.n <= state.ladderToday)
+            .reduce((sum, s) => sum + s.xp, 0);
+          state.ladderXPWatermark = state.ladderToday;
+          await saveJSON(todayKey('ladder-xp-watermark'), {v: state.ladderXPWatermark});
+          await adjustXP(earned);
+          popFloatXP(item, earned);
+        }
+      };
+      wrap.appendChild(item);
+    });
+    updateHeaderBadge();
+  }
+
+  function composeChip(text, textareaId, extraClass){
+    const chip = document.createElement('div');
+    chip.className = 'phrase-chip ' + (extraClass || '');
+    chip.innerHTML = `<span>${text}</span><span class="tap-hint">Tap to use</span>`;
+    chip.onclick = () => {
+      const box = el(textareaId);
+      box.value = text + ' ';
+      box.focus();
+      box.selectionStart = box.selectionEnd = box.value.length;
+    };
+    return chip;
+  }
+
+  function renderSay(){
+    ['start','respond','moment'].forEach(g => {
+      const titleEl = el('grpTitle-' + g);
+      titleEl.innerHTML = ICONS[SAY_GROUP_ICONS[g]] + '<span>' + titleEl.textContent + '</span>';
+      const wrap = el('grp-' + g);
+      wrap.innerHTML = '';
+      SAY_GROUPS[g].forEach(t => wrap.appendChild(composeChip(t, 'sayCompose')));
+    });
+    el('sayShowBtn').onclick = () => {
+      const text = el('sayCompose').value.trim();
+      if(text) showOverlay(text, false);
+    };
+  }
+
+  function renderGroupSteps(){
+    const wrap = el('groupSteps');
+    wrap.innerHTML = '';
+    GROUP_STEPS.forEach((s, i) => {
+      const card = document.createElement('div');
+      card.className = 'step-card';
+      card.innerHTML = `<div class="step-num">${i+1}</div><div class="step-body"><div class="step-th">${s.en}</div></div>`;
+      const body = card.querySelector('.step-body');
+      if(s.options){
+        const hint = document.createElement('div');
+        hint.style.cssText = 'font-size:12px; color:var(--ink-soft); margin-bottom:8px;';
+        hint.textContent = 'Pick the job that fits you:';
+        body.appendChild(hint);
+        s.options.forEach(opt => body.appendChild(composeChip(opt, 'groupCompose')));
+      } else {
+        body.appendChild(composeChip(s.line, 'groupCompose'));
+      }
+      wrap.appendChild(card);
+    });
+    const done = document.createElement('div');
+    done.style.cssText = 'text-align:center; font-family:IBM Plex Mono,monospace; font-size:12px; color:var(--ink-soft); padding-top:4px; letter-spacing:0.1em;';
+    done.textContent = 'DONE';
+    wrap.appendChild(done);
+    el('groupShowBtn').onclick = () => {
+      const text = el('groupCompose').value.trim();
+      if(text) showOverlay(text, false);
+    };
+  }
+
+  function renderChecks(){
+    const wrap = el('checkList');
+    wrap.innerHTML = '';
+    CHECK_ITEMS.forEach(c => {
+      const done = !!state.checks[c.id];
+      const row = document.createElement('div');
+      row.className = 'check-row';
+      row.innerHTML = `<div class="row-icon">${ICONS[c.icon]}</div><div class="check-box ${done?'done':''}">${CHECK_SVG}</div><div class="check-th">${c.en}</div>`;
+      row.onclick = async () => {
+        const nowDone = !state.checks[c.id];
+        state.checks[c.id] = nowDone;
+        await saveJSON(todayKey('checks'), state.checks);
+        renderChecks();
+        await adjustXP(nowDone ? c.xp : -c.xp);
+        if(nowDone) popFloatXP(row, c.xp);
+      };
+      wrap.appendChild(row);
+    });
+  }
+
+  let situationIdCounter = 0;
+
+  function buildBrainBlock(block){
+    const div = document.createElement('div');
+    div.className = 'brain-note';
+    div.innerHTML = `${ICONS.brain}<p>${block.text}</p>`;
+    return div;
+  }
+
+  function buildTryListBlock(block){
+    const wrap = document.createElement('div');
+    if(block.title){
+      const t = document.createElement('div');
+      t.className = 'block-title';
+      t.textContent = block.title;
+      wrap.appendChild(t);
+    }
+    block.items.forEach(text => {
+      const row = document.createElement('div');
+      row.className = 'try-row';
+      row.innerHTML = `<div class="try-box">${CHECK_SVG}</div><span>${text}</span>`;
+      row.onclick = () => {
+        row.classList.toggle('checked');
+        row.querySelector('.try-box').classList.toggle('checked');
+      };
+      wrap.appendChild(row);
+    });
+    return wrap;
+  }
+
+  function buildMissionBlock(block){
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `<div class="mission-instruction">${block.instruction}${block.hint ? `<span class="sub-hint">${block.hint}</span>` : ''}</div>`;
+    const row = document.createElement('div');
+    row.className = 'choice-row';
+    block.choices.forEach(c => {
+      const chip = document.createElement('div');
+      chip.className = 'choice-chip';
+      chip.textContent = c;
+      chip.onclick = () => {
+        row.querySelectorAll('.choice-chip').forEach(x => x.classList.remove('selected'));
+        chip.classList.add('selected');
+      };
+      row.appendChild(chip);
+    });
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  function buildPhrasesBlock(block){
+    const wrap = document.createElement('div');
+    if(block.title){
+      const t = document.createElement('div');
+      t.className = 'block-title';
+      t.textContent = block.title;
+      wrap.appendChild(t);
+    }
+    const taId = 'sit-compose-' + (situationIdCounter++);
+    block.items.forEach(text => wrap.appendChild(composeChip(text, taId, 'sos-chip')));
+    const box = document.createElement('div');
+    box.className = 'compose-box sos-compose';
+    box.innerHTML = `
+      <textarea id="${taId}" rows="2" placeholder="Tap a line above, then finish it..."></textarea>
+      <button class="compose-show-btn sos-show-btn">Show full screen</button>`;
+    box.querySelector('button').onclick = () => {
+      const text = el(taId).value.trim();
+      if(text) showOverlay(text, true);
+    };
+    wrap.appendChild(box);
+    return wrap;
+  }
+
+  function buildCheckinBlock(block){
+    const wrap = document.createElement('div');
+    if(block.title){
+      const t = document.createElement('div');
+      t.className = 'block-title';
+      t.textContent = block.title;
+      wrap.appendChild(t);
+    }
+    const row = document.createElement('div');
+    row.className = 'checkin-row';
+    const result = document.createElement('div');
+    result.className = 'checkin-result';
+
+    const LABELS = {bored:'Bored', restless:'Restless', confused:'Confused', finished:'Finished'};
+    Object.keys(LABELS).forEach(key => {
+      const chip = document.createElement('div');
+      chip.className = 'checkin-chip';
+      chip.textContent = LABELS[key];
+      chip.onclick = () => {
+        row.querySelectorAll('.checkin-chip').forEach(x => x.classList.remove('selected'));
+        chip.classList.add('selected');
+        const data = CHECKIN_RESULTS[key];
+        result.innerHTML = '';
+        const lead = document.createElement('div');
+        lead.className = 'result-lead';
+        lead.textContent = data.lead;
+        result.appendChild(lead);
+        if(data.tryList){
+          result.appendChild(buildTryListBlock({items: data.tryList}));
+        }
+        if(data.phrases){
+          result.appendChild(buildPhrasesBlock({items: data.phrases}));
+        }
+        result.classList.add('show');
+      };
+      row.appendChild(chip);
+    });
+    wrap.appendChild(row);
+    wrap.appendChild(result);
+    return wrap;
+  }
+
+  const BLOCK_BUILDERS = {
+    brain: buildBrainBlock,
+    tryList: buildTryListBlock,
+    mission: buildMissionBlock,
+    phrases: buildPhrasesBlock,
+    checkin: buildCheckinBlock
+  };
+
+  function renderSOS(){
+    el('sosIconWrap').innerHTML = ICONS.rocket;
+    const wrap = el('situationList');
+    wrap.innerHTML = '';
+    SITUATIONS.forEach(sit => {
+      const card = document.createElement('div');
+      card.className = 'situation-card';
+
+      const head = document.createElement('div');
+      head.className = 'situation-head';
+      head.innerHTML = `
+        <div class="situation-icon">${ICONS[sit.icon]}</div>
+        <div class="situation-label">${sit.label}</div>
+        <svg class="situation-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
+      head.onclick = () => card.classList.toggle('open');
+
+      const detail = document.createElement('div');
+      detail.className = 'situation-detail';
+      sit.blocks.forEach(block => {
+        const builder = BLOCK_BUILDERS[block.type];
+        if(builder) detail.appendChild(builder(block));
+      });
+
+      card.appendChild(head);
+      card.appendChild(detail);
+      wrap.appendChild(card);
+    });
+  }
+
+  function renderMeter(containerId, percent){
+    const track = el(containerId);
+    const segments = 10;
+    const filled = Math.round((Math.max(0, Math.min(100, percent)) / 100) * segments);
+    track.innerHTML = '';
+    for(let i = 0; i < segments; i++){
+      const seg = document.createElement('div');
+      seg.className = 'meter-seg' + (i < filled ? ' lit' : '');
+      track.appendChild(seg);
+    }
+  }
+
+  function refreshXPStats(){
+    const level = Math.floor(state.xpLifetime / 100) + 1;
+    const intoLevel = state.xpLifetime % 100;
+    const rewardProgress = state.xpLifetime % 500;
+    const rewardsEarned = Math.floor(state.xpLifetime / 500);
+
+    el('xpLevelNum').textContent = 'LV. ' + level;
+    el('xpLevelSub').textContent = intoLevel + ' / 100 XP to next level';
+    renderMeter('levelBar', (intoLevel / 100) * 100);
+
+    el('rewardLabel').textContent = rewardProgress + ' / 500';
+    renderMeter('rewardBar', (rewardProgress / 500) * 100);
+    el('rewardsEarned').textContent = 'Rewards earned so far: ' + rewardsEarned;
+
+    el('xpTodayNum').innerHTML = ICONS.coin + '<span>' + state.xpToday + '</span>';
+    el('xpWeekNum').innerHTML = ICONS.coin + '<span>' + state.xpWeek + '</span>';
+
+    el('levelIconWrap').innerHTML = ICONS.medal;
+    el('giftIconWrap').innerHTML = ICONS.gift;
+    updateHeaderBadge();
+  }
+
+  function renderXPGrid(){
+    const wrap = el('xpGrid');
+    wrap.innerHTML = '';
+    XP_ACTIONS.forEach(a => {
+      const count = state.xpActionsToday[a.id] || 0;
+      const btn = document.createElement('div');
+      btn.className = 'xp-action-btn pixel-tile';
+      btn.innerHTML = `
+        ${count > 0 ? `<div class="xp-action-count">×${count}</div>` : ''}
+        ${count > 0 ? `<div class="xp-action-undo">−</div>` : ''}
+        <div class="xp-action-icon">${ICONS[a.icon]}</div>
+        <div class="xp-action-label">${a.label}</div>
+        <div class="xp-action-value">+${a.xp} XP</div>`;
+      btn.onclick = (e) => logXP(a, btn);
+      const undoEl = btn.querySelector('.xp-action-undo');
+      if(undoEl){
+        undoEl.onclick = (e) => { e.stopPropagation(); undoXP(a); };
+      }
+      wrap.appendChild(btn);
+    });
+  }
+
+  function popFloatXP(originEl, amount){
+    if(state.quietMode) return;
+    const rect = originEl.getBoundingClientRect();
+    const f = document.createElement('div');
+    f.className = 'xp-float';
+    f.innerHTML = ICONS.coin + '<span>+' + amount + '</span>';
+    f.style.left = (rect.left + rect.width/2 - 24) + 'px';
+    f.style.top = (rect.top + 6) + 'px';
+    document.body.appendChild(f);
+    setTimeout(() => f.remove(), 900);
+  }
+
+  async function adjustXP(delta){
+    if(!delta) return {leveledUp:false, rewardUnlocked:false};
+    const prevLevel = Math.floor(state.xpLifetime / 100) + 1;
+    const prevRewards = Math.floor(state.xpLifetime / 500);
+
+    state.xpLifetime = Math.max(0, state.xpLifetime + delta);
+    state.xpToday = Math.max(0, state.xpToday + delta);
+    state.xpWeek = Math.max(0, state.xpWeek + delta);
+
+    await saveJSON('xp-lifetime', {v: state.xpLifetime});
+    await saveJSON(todayKey('xp-daily'), {v: state.xpToday});
+    await saveJSON(mondayKey(), {v: state.xpWeek});
+
+    refreshXPStats();
+
+    const newLevel = Math.floor(state.xpLifetime / 100) + 1;
+    const newRewards = Math.floor(state.xpLifetime / 500);
+    const rewardUnlocked = delta > 0 && newRewards > prevRewards;
+    const leveledUp = delta > 0 && !rewardUnlocked && newLevel > prevLevel;
+    // No pop-up announcements here on purpose — numbers update quietly wherever
+    // they're shown, and he only sees them if he chooses to look at the XP tab.
+    return {leveledUp, rewardUnlocked};
+  }
+
+  async function logXP(action, btnEl){
+    state.xpActionsToday[action.id] = (state.xpActionsToday[action.id] || 0) + 1;
+    await saveJSON(todayKey('xp-actions'), state.xpActionsToday);
+    await adjustXP(action.xp);
+
+    renderXPGrid();
+    popFloatXP(btnEl, action.xp);
+    btnEl.classList.add('bump');
+    setTimeout(() => btnEl.classList.remove('bump'), 300);
+  }
+
+  async function undoXP(action){
+    const count = state.xpActionsToday[action.id] || 0;
+    if(count <= 0) return;
+    state.xpActionsToday[action.id] = count - 1;
+    await saveJSON(todayKey('xp-actions'), state.xpActionsToday);
+    await adjustXP(-action.xp);
+    renderXPGrid();
+  }
+
+  let timerInterval = null;
+  function showOverlay(text, isSOS){
+    const ov = el('overlay');
+    el('ovText').textContent = text;
+    ov.style.background = isSOS ? 'var(--rust)' : 'var(--moss)';
+    ov.classList.add('show');
+    clearInterval(timerInterval);
+    el('ovTimer').textContent = '';
+    if(text.toLowerCase().includes('one minute')){
+      let secs = 60;
+      el('ovTimer').textContent = '0:60';
+      timerInterval = setInterval(() => {
+        secs--;
+        const m = Math.floor(secs/60), s = String(secs%60).padStart(2,'0');
+        el('ovTimer').textContent = m + ':' + s;
+        if(secs <= 0){ clearInterval(timerInterval); el('ovTimer').textContent = "Time's up"; }
+      }, 1000);
+    }
+  }
+  function hideOverlay(){
+    el('overlay').classList.remove('show');
+    clearInterval(timerInterval);
+  }
+  el('overlay').onclick = hideOverlay;
+  el('ovClose').onclick = (e) => { e.stopPropagation(); hideOverlay(); };
+
+  const TITLES = {today:"J.J.'s Class Missions", say:'Say This', group:'Group Work', check:'Visibility Check', math:'Math Notes', remind:'Reminders', xp:'XP Board', sos:'Mission Control'};
+  document.querySelectorAll('nav.tabbar button').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('section.screen').forEach(s => s.classList.remove('active'));
+      const target = btn.dataset.screen;
+      el('screen-' + target).classList.add('active');
+      el('screenTitle').textContent = TITLES[target];
+      const badge = el('headerBadge');
+      if(target === 'today'){
+        badge.dataset.mode = 'ladder';
+      } else if(target === 'xp'){
+        badge.dataset.mode = 'xp';
+      } else {
+        badge.dataset.mode = '';
+      }
+      updateHeaderBadge();
+    };
+  });
+
+  async function init(){
+    renderScene();
+    renderNavIcons();
+    initMathTools();
+    el('dateLabel').textContent = fmtDate();
+    state.missions = await loadJSON(todayKey('missions'), {});
+    const ladderToday = await loadJSON(todayKey('ladder'), {v:0});
+    state.ladderToday = ladderToday.v || 0;
+    const best = await loadJSON('ladder-best', {v:0});
+    state.ladderBest = best.v || 0;
+    const watermark = await loadJSON(todayKey('ladder-xp-watermark'), {v:0});
+    state.ladderXPWatermark = watermark.v || 0;
+    state.checks = await loadJSON(todayKey('checks'), {});
+
+    const lifetime = await loadJSON('xp-lifetime', {v:0});
+    state.xpLifetime = lifetime.v || 0;
+    const daily = await loadJSON(todayKey('xp-daily'), {v:0});
+    state.xpToday = daily.v || 0;
+    const weekly = await loadJSON(mondayKey(), {v:0});
+    state.xpWeek = weekly.v || 0;
+    state.xpActionsToday = await loadJSON(todayKey('xp-actions'), {});
+    state.reminders = await loadJSON('reminders', []);
+
+    const quiet = await loadJSON('quiet-mode', {v:false});
+    state.quietMode = !!quiet.v;
+    const qBtn = el('quietToggle');
+    qBtn.innerHTML = ICONS.moon;
+    qBtn.classList.toggle('on', state.quietMode);
+    qBtn.onclick = async () => {
+      state.quietMode = !state.quietMode;
+      qBtn.classList.toggle('on', state.quietMode);
+      await saveJSON('quiet-mode', {v: state.quietMode});
+      updateHeaderBadge();
+    };
+    el('headerBadge').dataset.mode = 'ladder';
+
+    renderMissions();
+    renderLadder();
+    renderSay();
+    renderGroupSteps();
+    renderChecks();
+    renderSOS();
+    renderXPGrid();
+    refreshXPStats();
+    updateHeaderBadge();
+    initReminders();
+  }
+  init();
+})();
+</script>
