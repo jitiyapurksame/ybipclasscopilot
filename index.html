@@ -471,6 +471,22 @@
   }
   .choice-chip.selected{background:var(--moss); border-color:var(--moss); color:white;}
 
+  .mission-timer{display:flex; align-items:center; gap:16px; margin-top:16px;}
+  .timer-ring-wrap{position:relative; width:76px; height:76px; flex-shrink:0;}
+  .timer-ring-wrap svg{width:100%; height:100%; transform:rotate(-90deg);}
+  .timer-ring-bg{fill:none; stroke:rgba(255,255,255,0.15); stroke-width:6;}
+  .timer-ring-fg{fill:none; stroke:var(--coin); stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset 1s linear;}
+  .timer-readout{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:15px; color:white; text-align:center;
+  }
+  .timer-controls{display:flex; flex-direction:column; gap:8px;}
+  .timer-btn{
+    padding:8px 16px; border-radius:10px; border:none; background:var(--moss);
+    color:white; font-weight:700; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif;
+  }
+  .timer-btn.secondary{background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3); color:white;}
+
   .checkin-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
   .checkin-chip{
     background:rgba(255,255,255,0.07); border:1.5px solid rgba(232,163,61,0.4);
@@ -1775,7 +1791,7 @@
       id:'quit', icon:'pause', label:"I can't do it and I want to quit",
       blocks:[
         {type:'brain', text:"Your brain wants an escape because this feels too hard right now. That's a normal reaction — it doesn't mean you can't do it."},
-        {type:'mission', instruction:"Stay for 5 more minutes.", hint:"Choose ONE:", choices:["Ask one question", "Write one note", "Find one interesting fact"]},
+        {type:'mission', instruction:"Stay for 5 more minutes.", hint:"Choose ONE:", choices:["Ask one question", "Write one note", "Find one interesting fact"], timerMinutes:5},
         {type:'checkin', title:'Still want to quit? Check in with yourself:'}
       ]
     },
@@ -1791,7 +1807,7 @@
       id:'read', icon:'book', label:"I want to read other books instead",
       blocks:[
         {type:'brain', text:"Wanting to escape into a book usually means this task feels too hard, too boring, or too much right now."},
-        {type:'mission', instruction:"Do one small thing first, then it's okay to ask about reading at break.", hint:"Choose ONE:", choices:["Ask one question", "Write one note", "Find one interesting fact", "Set a 5-minute goal"]}
+        {type:'mission', instruction:"Do one small thing first, then it's okay to ask about reading at break.", hint:"Choose ONE:", choices:["Ask one question", "Write one note", "Find one interesting fact", "Set a 5-minute goal"], timerMinutes:5}
       ]
     },
     {
@@ -2005,6 +2021,78 @@
     return wrap;
   }
 
+  function buildTimer(minutes){
+    const totalSeconds = minutes * 60;
+    let remaining = totalSeconds;
+    let intervalId = null;
+    const R = 32;
+    const circumference = 2 * Math.PI * R;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'mission-timer';
+    wrap.innerHTML = `
+      <div class="timer-ring-wrap">
+        <svg viewBox="0 0 76 76">
+          <circle class="timer-ring-bg" cx="38" cy="38" r="${R}"/>
+          <circle class="timer-ring-fg" cx="38" cy="38" r="${R}" stroke-dasharray="${circumference}" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-readout"></div>
+      </div>
+      <div class="timer-controls">
+        <button class="timer-btn timer-start">Start</button>
+        <button class="timer-btn secondary timer-reset">Reset</button>
+      </div>`;
+    const fg = wrap.querySelector('.timer-ring-fg');
+    const readout = wrap.querySelector('.timer-readout');
+    const startBtn = wrap.querySelector('.timer-start');
+    const resetBtn = wrap.querySelector('.timer-reset');
+
+    function render(){
+      if(remaining <= 0){
+        readout.textContent = "Time's up";
+        readout.style.fontSize = '11px';
+        fg.style.strokeDashoffset = '0';
+        return;
+      }
+      const m = Math.floor(remaining / 60);
+      const s = String(remaining % 60).padStart(2, '0');
+      readout.textContent = m + ':' + s;
+      readout.style.fontSize = '';
+      fg.style.strokeDashoffset = String(circumference * (1 - remaining / totalSeconds));
+    }
+    function tick(){
+      remaining -= 1;
+      if(remaining <= 0){
+        remaining = 0;
+        clearInterval(intervalId);
+        intervalId = null;
+        startBtn.textContent = 'Start';
+      }
+      render();
+    }
+    startBtn.onclick = () => {
+      if(intervalId){
+        clearInterval(intervalId);
+        intervalId = null;
+        startBtn.textContent = 'Start';
+      } else {
+        if(remaining <= 0) remaining = totalSeconds;
+        intervalId = setInterval(tick, 1000);
+        startBtn.textContent = 'Pause';
+        render();
+      }
+    };
+    resetBtn.onclick = () => {
+      clearInterval(intervalId);
+      intervalId = null;
+      remaining = totalSeconds;
+      startBtn.textContent = 'Start';
+      render();
+    };
+    render();
+    return wrap;
+  }
+
   function buildMissionBlock(block){
     const wrap = document.createElement('div');
     wrap.innerHTML = `<div class="mission-instruction">${block.instruction}${block.hint ? `<span class="sub-hint">${block.hint}</span>` : ''}</div>`;
@@ -2021,6 +2109,9 @@
       row.appendChild(chip);
     });
     wrap.appendChild(row);
+    if(block.timerMinutes){
+      wrap.appendChild(buildTimer(block.timerMinutes));
+    }
     return wrap;
   }
 
