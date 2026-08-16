@@ -1,33 +1,33 @@
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
 
   :root{
-    --paper:#EAF6FF;
-    --card:rgba(255,251,240,0.8);
-    --ink:#3B2A1E;
-    --ink-soft:#7A6A52;
-    --moss:#3F7D3A;
-    --moss-light:rgba(63,125,58,0.16);
-    --amber:#E8A33D;
-    --amber-light:rgba(232,163,61,0.25);
-    --rust:#C1502B;
-    --rust-light:rgba(193,80,43,0.18);
-    --teal:#3F7D3A;
-    --line:rgba(122,90,58,0.28);
-    --coin:#F5A623;
-    --radius:16px;
+    --paper:#F1ECDD;
+    --card:rgba(255,255,255,0.92);
+    --ink:#16293A;
+    --ink-soft:#5B6B78;
+    --moss:#0E2A45;       /* primary navy — mission/action accent */
+    --moss-light:rgba(14,42,69,0.13);
+    --amber:#D9A441;
+    --amber-light:rgba(217,164,65,0.25);
+    --rust:#C1503A;       /* coral — alert/SOS accent */
+    --rust-light:rgba(193,80,58,0.18);
+    --teal:#0E2A45;
+    --teal-dark:#081826;
+    --line:rgba(14,42,69,0.22);
+    --coin:#E8A33D;
+    --mono:'Space Mono','Courier New',monospace;
+    --radius:12px;
   }
 
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  html,body{margin:0; padding:0; height:100%; background:#8FCB6B;}
+  html,body{margin:0; padding:0; height:100%; background:#F1ECDD;}
   #app{
     font-family:'Inter',sans-serif;
-    background:
-      radial-gradient(70px 70px at 84% 8%, rgba(255,232,150,0.9), rgba(255,232,150,0) 70%),
-      radial-gradient(50px 20px at 15% 8%, rgba(255,255,255,0.85), rgba(255,255,255,0) 72%),
-      radial-gradient(65px 24px at 40% 5%, rgba(255,255,255,0.75), rgba(255,255,255,0) 72%),
-      radial-gradient(45px 18px at 62% 11%, rgba(255,255,255,0.7), rgba(255,255,255,0) 72%),
-      linear-gradient(180deg, #6EC6FF 0%, #A8DDFF 20%, #CFEFC0 38%, #9FCC7C 52%, #7DB85B 72%, #5E9E45 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(14,42,69,0.035) 0px, rgba(14,42,69,0.035) 1px, transparent 1px, transparent 28px),
+      repeating-linear-gradient(90deg, rgba(14,42,69,0.035) 0px, rgba(14,42,69,0.035) 1px, transparent 1px, transparent 28px);
     color:var(--ink);
     height:100vh;
     height:100dvh;
@@ -43,47 +43,85 @@
   }
   .scene svg{position:absolute;}
 
-  .mono{font-family:'IBM Plex Mono',monospace; letter-spacing:0.03em;}
-  .display{font-family:'Space Grotesk',sans-serif;}
+  .mono{font-family:'Space Mono',monospace; letter-spacing:0.03em;}
+  .display{font-family:'Inter',sans-serif;}
 
   header.topbar{
-    padding:18px 20px 12px;
+    padding:16px 18px 14px;
     display:flex;
-    align-items:baseline;
+    align-items:center;
     justify-content:space-between;
     flex-shrink:0;
+    background:var(--teal);
+    border-bottom:3px solid var(--amber);
+    position:relative;
+    z-index:1;
   }
   header.topbar .eyebrow{
-    font-size:11px;
+    font-family:var(--mono);
+    font-size:10.5px;
     text-transform:uppercase;
     letter-spacing:0.12em;
-    color:var(--ink-soft);
+    color:var(--amber);
   }
   header.topbar h1{
-    margin:2px 0 0;
-    font-size:22px;
+    margin:3px 0 0;
+    font-size:19px;
     font-weight:700;
+    color:#fff;
+    font-family:var(--mono);
+    letter-spacing:0.01em;
   }
   header.topbar .badge{
+    font-family:var(--mono);
     font-size:11px;
-    background:var(--moss-light);
-    border:1px solid rgba(63,125,58,0.35);
-    color:var(--moss);
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(217,164,65,0.5);
+    color:var(--amber);
     padding:5px 10px;
     border-radius:20px;
-    font-weight:600;
+    font-weight:700;
     white-space:nowrap;
   }
   .header-right{display:flex; align-items:center; gap:8px;}
   .quiet-toggle{
     width:30px; height:30px; border-radius:50%; flex-shrink:0;
-    background:rgba(255,255,255,0.55); border:1px solid var(--line);
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.3);
     display:flex; align-items:center; justify-content:center; cursor:pointer;
     padding:0;
   }
-  .quiet-toggle svg{width:16px; height:16px;}
-  .quiet-toggle.on{background:rgba(63,125,58,0.18); border-color:rgba(63,125,58,0.4);}
+  .quiet-toggle svg{width:16px; height:16px; stroke:#fff; color:#fff;}
+  .quiet-toggle.on{background:rgba(217,164,65,0.28); border-color:var(--amber);}
   
+
+  .ship-hero{
+    background:#fff; border:2px dashed var(--amber); border-radius:var(--radius);
+    padding:14px 12px 14px; margin-bottom:14px;
+    box-shadow:0 2px 10px rgba(14,42,69,0.1);
+  }
+  .ship-scene{border-radius:8px; overflow:hidden;}
+  .ship-scene svg{width:100%; height:auto; display:block;}
+  .ship-hero-caption{
+    font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--ink-soft); text-align:center; margin-top:8px;
+  }
+  .wave-path{animation:waveDrift 7s linear infinite;}
+  @keyframes waveDrift{ from{transform:translateX(0);} to{transform:translateX(-32px);} }
+  .ship-hero.no-motion .wave-path{animation:none;}
+  @media (prefers-reduced-motion: reduce){ .wave-path{animation:none;} }
+
+  .deck-check{margin-top:12px; padding-top:10px; border-top:1px dashed var(--line);}
+  .deck-check-label{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:700;
+    color:var(--ink-soft); margin:8px 0 6px;
+  }
+  .deck-check-label:first-child{margin-top:0;}
+  .deck-pill-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:4px;}
+  .deck-pill{
+    padding:8px 14px; border-radius:20px; background:var(--card); border:1.5px solid var(--line);
+    font-size:12.5px; font-weight:700; color:var(--ink-soft); cursor:pointer; font-family:'Inter',sans-serif;
+  }
+  .deck-pill.selected{background:var(--moss); color:white; border-color:var(--moss);}
 
   main{
     flex:1;
@@ -104,7 +142,7 @@
     margin-bottom:14px;
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter:blur(10px);
-    box-shadow:0 2px 10px rgba(63,125,58,0.1);
+    box-shadow:0 2px 10px rgba(14,42,69,0.1);
   }
   .card h2{
     margin:0 0 4px;
@@ -161,7 +199,7 @@
   .trail-node{
     width:36px; height:36px; border-radius:50%; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px;
+    font-family:'Space Mono',monospace; font-weight:600; font-size:13px;
     border:2px solid var(--line); color:var(--ink-soft); background:var(--card);
     transition:all .15s; z-index:1;
   }
@@ -176,7 +214,7 @@
     display:flex; justify-content:space-between; align-items:center;
     font-size:12px; color:var(--ink-soft); margin-top:2px; padding:0 2px;
   }
-  .best-strip b{color:var(--amber); font-family:'IBM Plex Mono',monospace;}
+  .best-strip b{color:var(--amber); font-family:'Space Mono',monospace;}
 
   /* --- Phrase chips --- */
   .phrase-group-title{
@@ -212,23 +250,23 @@
     padding:12px; cursor:pointer;
   }
   .compose-show-btn:active{opacity:0.85;}
-  .sos-title{color:#E3D9A8;}
+  .sos-title{color:var(--ink);}
   .sos-compose{
-    background:rgba(255,255,255,0.06);
-    border-color:rgba(232,163,61,0.4);
+    background:var(--card);
+    border-color:var(--line);
   }
-  .sos-compose textarea{color:white;}
-  .sos-compose textarea::placeholder{color:rgba(255,255,255,0.45);}
+  .sos-compose textarea{color:var(--ink);}
+  .sos-compose textarea::placeholder{color:var(--ink-soft);}
   .sos-show-btn{
     background:linear-gradient(135deg, #FF6B4A, var(--rust));
-    box-shadow:0 0 16px rgba(255,107,74,0.45);
+    box-shadow:0 0 16px rgba(193,80,58,0.3);
   }
 
   /* --- Group work steps --- */
   .step-card{display:flex; gap:14px; margin-bottom:4px;}
   .step-num{
     width:34px; height:34px; border-radius:10px; background:var(--teal); color:white;
-    display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace;
+    display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace;
     font-weight:600; flex-shrink:0; margin-top:2px;
   }
   .step-body{flex:1; padding-bottom:20px; border-left:2px dotted var(--line); margin-left:17px; padding-left:20px; margin-top:-34px; padding-top:36px;}
@@ -253,12 +291,12 @@
   .check-en{font-size:12px; color:var(--ink-soft);}
 
   /* --- Math Notes --- */
-  .math-subtabs{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; margin-bottom:2px;}
+  .math-subtabs{display:flex; flex-wrap:wrap; gap:8px; padding:2px 2px 10px; margin-bottom:2px;}
   .math-subtab{
-    flex-shrink:0; padding:9px 15px; border-radius:20px;
+    flex:1 1 auto; padding:9px 12px; border-radius:20px;
     background:var(--card); border:1.5px solid var(--line);
     font-size:12.5px; font-weight:700; cursor:pointer; color:var(--ink-soft);
-    font-family:'Inter',sans-serif;
+    font-family:'Inter',sans-serif; text-align:center; white-space:nowrap;
   }
   .math-subtab.active{background:var(--moss); color:white; border-color:var(--moss);}
   .math-panel{display:none;}
@@ -287,7 +325,7 @@
     width:42px; height:42px; border-radius:50%; background:var(--coin);
     display:flex; align-items:center; justify-content:center; position:relative;
     cursor:pointer; font-weight:700; color:white; font-size:14px;
-    font-family:'IBM Plex Mono',monospace;
+    font-family:'Space Mono',monospace;
   }
   .counter.crossed{opacity:0.55;}
   .counter.crossed::before, .counter.crossed::after{
@@ -313,13 +351,13 @@
   .pie-remove{background:none; border:none; color:var(--rust); font-weight:700; font-size:12px; cursor:pointer;}
   .pie-display{display:flex; align-items:center; gap:14px;}
   .pie-display svg{width:120px; height:120px; flex-shrink:0;}
-  .pie-fraction{font-family:'IBM Plex Mono',monospace; font-size:20px; font-weight:700; color:var(--ink);}
+  .pie-fraction{font-family:'Space Mono',monospace; font-size:20px; font-weight:700; color:var(--ink);}
 
   .hto-wrap{overflow-x:auto; padding:4px 0;}
   .hto-grid{display:flex; flex-direction:column; min-width:260px; max-width:340px;}
   .hto-row{display:grid; grid-template-columns:34px repeat(4,1fr); align-items:center; text-align:center;}
   .hto-cell{
-    font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:700;
+    font-family:'Space Mono',monospace; font-size:19px; font-weight:700;
     padding:5px 0; min-height:30px; color:var(--ink);
     border-right:2px solid var(--line);
   }
@@ -382,36 +420,23 @@
     background:var(--card); color:var(--ink); font-size:13px; font-family:'Inter',sans-serif; resize:none;
   }
 
-  /* --- SOS --- */
-  .sos-card{
-    background:
-      radial-gradient(46px 18px at 15% 14%, rgba(255,242,180,0.4), rgba(255,242,180,0) 72%),
-      radial-gradient(60px 22px at 78% 10%, rgba(255,242,180,0.35), rgba(255,242,180,0) 72%),
-      radial-gradient(38px 15px at 40% 22%, rgba(255,242,180,0.3), rgba(255,242,180,0) 72%),
-      radial-gradient(50px 18px at 88% 45%, rgba(255,255,255,0.22), rgba(255,255,255,0) 72%),
-      radial-gradient(42px 16px at 12% 60%, rgba(255,255,255,0.2), rgba(255,255,255,0) 72%),
-      linear-gradient(165deg, #4C8F45 0%, #2E5F2C 50%, #17301A 100%);
-    color:white; border:none;
-  }
+  /* --- Ship's Bridge (Mission Control) --- */
   .sos-head{display:flex; align-items:center; gap:12px; margin-bottom:4px;}
   .sos-icon-wrap{
     width:42px; height:42px; border-radius:12px; flex-shrink:0;
-    background:rgba(198,40,40,0.28); border:1px solid rgba(255,107,107,0.5);
+    background:var(--rust-light); border:1px solid rgba(193,80,58,0.4);
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 0 14px rgba(198,40,40,0.45);
   }
   .sos-icon-wrap svg{width:23px; height:23px;}
-  .sos-card h2{color:white; margin:0;}
-  .sos-card .sub{color:#D9CFA0;}
   .sos-chip{
-    background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.28);
-    color:white;
+    background:var(--card); border:1.5px solid var(--line);
+    color:var(--ink);
   }
-  .sos-chip .tap-hint{color:#FF8A80; font-weight:700;}
+  .sos-chip .tap-hint{color:var(--rust); font-weight:700;}
 
   /* --- Situation accordion (Mission Control) --- */
   .situation-card{
-    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15);
+    background:#fff; border:1px solid var(--line);
     border-radius:14px; margin-bottom:10px; overflow:hidden;
   }
   .situation-head{
@@ -420,39 +445,39 @@
   }
   .situation-icon{
     width:34px; height:34px; border-radius:10px; flex-shrink:0;
-    background:rgba(232,163,61,0.18); border:1px solid rgba(232,163,61,0.4);
+    background:var(--amber-light); border:1px solid rgba(217,164,65,0.4);
     display:flex; align-items:center; justify-content:center;
   }
   .situation-icon svg{width:19px; height:19px;}
-  .situation-label{flex:1; font-size:14px; font-weight:600; line-height:1.3;}
+  .situation-label{flex:1; font-size:14px; font-weight:600; line-height:1.3; color:var(--ink);}
   .situation-chevron{
-    width:18px; height:18px; flex-shrink:0; color:rgba(255,255,255,0.5);
+    width:18px; height:18px; flex-shrink:0; color:var(--ink-soft);
     transition:transform .2s;
   }
   .situation-card.open .situation-chevron{transform:rotate(180deg);}
   .situation-detail{
-    display:none; padding:0 14px 16px; border-top:1px solid rgba(255,255,255,0.1);
+    display:none; padding:0 14px 16px; border-top:1px solid var(--line);
     padding-top:14px;
   }
   .situation-card.open .situation-detail{display:block;}
 
   .brain-note{
     display:flex; gap:10px; align-items:flex-start; margin-bottom:14px;
-    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2);
+    background:var(--moss-light); border:1px solid rgba(14,42,69,0.18);
     border-radius:12px; padding:12px;
   }
   .brain-note svg{width:20px; height:20px; flex-shrink:0; margin-top:1px;}
-  .brain-note p{margin:0; font-size:13px; line-height:1.5; color:#DCE3FF;}
+  .brain-note p{margin:0; font-size:13px; line-height:1.5; color:var(--ink);}
 
-  .block-title{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#E3D9A8; font-weight:700; margin:14px 0 8px;}
+  .block-title{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); font-weight:700; margin:14px 0 8px;}
   .block-title:first-of-type{margin-top:0;}
 
   .try-row{
     display:flex; align-items:center; gap:10px; padding:9px 4px;
-    font-size:14px; color:#EDF0FF; cursor:pointer;
+    font-size:14px; color:var(--ink); cursor:pointer;
   }
   .try-box{
-    width:20px; height:20px; border-radius:6px; border:1.6px solid rgba(255,255,255,0.4); flex-shrink:0;
+    width:20px; height:20px; border-radius:6px; border:1.6px solid var(--line); flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
   }
   .try-box svg{width:12px; height:12px; stroke:white; opacity:0;}
@@ -461,13 +486,13 @@
   .try-row.checked span{text-decoration:line-through; opacity:0.6;}
 
   .mission-instruction{
-    font-size:14px; font-weight:700; color:white; margin-bottom:10px;
+    font-size:14px; font-weight:700; color:var(--ink); margin-bottom:10px;
   }
-  .mission-instruction .sub-hint{display:block; font-weight:500; font-size:12px; color:#D9CFA0; margin-top:2px;}
+  .mission-instruction .sub-hint{display:block; font-weight:500; font-size:12px; color:var(--ink-soft); margin-top:2px;}
   .choice-row{display:flex; flex-wrap:wrap; gap:8px;}
   .choice-chip{
-    background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.28);
-    color:#EDF0FF; font-size:12.5px; font-weight:600; padding:9px 12px; border-radius:20px;
+    background:var(--card); border:1.5px solid var(--line);
+    color:var(--ink); font-size:12.5px; font-weight:600; padding:9px 12px; border-radius:20px;
     cursor:pointer;
   }
   .choice-chip.selected{background:var(--moss); border-color:var(--moss); color:white;}
@@ -475,35 +500,35 @@
   .mission-timer{display:flex; align-items:center; gap:16px; margin-top:16px;}
   .timer-ring-wrap{position:relative; width:76px; height:76px; flex-shrink:0;}
   .timer-ring-wrap svg{width:100%; height:100%; transform:rotate(-90deg);}
-  .timer-ring-bg{fill:none; stroke:rgba(255,255,255,0.15); stroke-width:6;}
-  .timer-ring-fg{fill:none; stroke:var(--coin); stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset 1s linear;}
+  .timer-ring-bg{fill:none; stroke:var(--line); stroke-width:6;}
+  .timer-ring-fg{fill:none; stroke:var(--amber); stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset 1s linear;}
   .timer-readout{
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:15px; color:white; text-align:center;
+    font-family:'Space Mono',monospace; font-weight:700; font-size:15px; color:var(--ink); text-align:center;
   }
   .timer-controls{display:flex; flex-direction:column; gap:8px;}
   .timer-btn{
     padding:8px 16px; border-radius:10px; border:none; background:var(--moss);
     color:white; font-weight:700; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif;
   }
-  .timer-btn.secondary{background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3); color:white;}
+  .timer-btn.secondary{background:var(--card); border:1px solid var(--line); color:var(--ink);}
 
   .checkin-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
   .checkin-chip{
-    background:rgba(255,255,255,0.07); border:1.5px solid rgba(232,163,61,0.4);
-    color:#EDF0FF; font-size:12.5px; font-weight:600; padding:9px 14px; border-radius:20px;
+    background:var(--card); border:1.5px solid var(--line);
+    color:var(--ink); font-size:12.5px; font-weight:600; padding:9px 14px; border-radius:20px;
     cursor:pointer;
   }
-  .checkin-chip.selected{background:#3F7D3A; border-color:#3F7D3A; color:white;}
+  .checkin-chip.selected{background:var(--moss); border-color:var(--moss); color:white;}
   .checkin-result{
-    background:rgba(255,255,255,0.05); border:1px dashed rgba(255,255,255,0.25);
+    background:var(--paper); border:1px dashed var(--line);
     border-radius:12px; padding:12px; display:none;
   }
   .checkin-result.show{display:block;}
-  .checkin-result .result-lead{font-size:12.5px; color:#D9CFA0; margin-bottom:8px;}
+  .checkin-result .result-lead{font-size:12.5px; color:var(--ink-soft); margin-bottom:8px;}
 
-  /* --- XP Board (retro game style) --- */
-  .pixel-font{font-family:'Press Start 2P', monospace; letter-spacing:0.02em;}
+  /* --- XP Board (engine room readouts) --- */
+  .pixel-font{font-family:var(--mono); font-weight:700; letter-spacing:0.04em;}
   .pixel-tile{
     border-radius:0 !important;
     clip-path: polygon(
@@ -513,8 +538,8 @@
       6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
     );
   }
-  .xp-level-card{background:linear-gradient(135deg, var(--moss), #1B3A1A); color:white; border:none; box-shadow:0 4px 0 rgba(0,0,0,0.28);}
-  .xp-reward-card{background:linear-gradient(135deg, var(--rust), #5C2A16); color:white; border:none; box-shadow:0 4px 0 rgba(0,0,0,0.28);}
+  .xp-level-card{background:linear-gradient(135deg, var(--moss), var(--teal-dark)); color:white; border:none; box-shadow:0 4px 0 rgba(0,0,0,0.28);}
+  .xp-reward-card{background:linear-gradient(135deg, var(--rust), #5C241A); color:white; border:none; box-shadow:0 4px 0 rgba(0,0,0,0.28);}
   .xp-level-top{display:flex; align-items:center; gap:14px; margin-bottom:12px;}
   .xp-icon-wrap{
     width:44px; height:44px; background:rgba(255,255,255,0.18);
@@ -530,7 +555,7 @@
   }
   .meter-seg{flex:1; background:rgba(255,255,255,0.15);}
   .meter-seg.lit{background:var(--coin);}
-  .rewards-earned{font-size:12px; opacity:0.85; margin-top:10px; font-family:'IBM Plex Mono',monospace;}
+  .rewards-earned{font-size:12px; opacity:0.85; margin-top:10px; font-family:'Space Mono',monospace;}
 
   .stat-row{display:flex; gap:12px; margin-bottom:14px;}
   .stat-chip{
@@ -559,11 +584,11 @@
   .xp-action-count{
     position:absolute; top:6px; right:6px; min-width:18px; height:18px; padding:0 4px;
     background:var(--moss); color:white; border-radius:9px; font-size:10px; font-weight:700;
-    display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace;
+    display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace;
   }
   .xp-action-undo{
     position:absolute; top:6px; left:6px; width:18px; height:18px; border-radius:50%;
-    background:rgba(63,125,58,0.14); border:1px solid rgba(63,125,58,0.35);
+    background:rgba(14,42,69,0.14); border:1px solid rgba(14,42,69,0.35);
     color:var(--ink); font-size:12px; font-weight:700; line-height:16px;
     text-align:center;
   }
@@ -595,11 +620,11 @@
   }
   #overlay.show{display:flex;}
   #overlay .ov-text{
-    font-family:'Space Grotesk',sans-serif; font-weight:700;
+    font-family:'Inter',sans-serif; font-weight:700;
     font-size:clamp(30px, 9vw, 46px); line-height:1.15;
   }
   #overlay .ov-timer{
-    margin-top:26px; font-family:'IBM Plex Mono',monospace; font-size:15px; opacity:0.85;
+    margin-top:26px; font-family:'Space Mono',monospace; font-size:15px; opacity:0.85;
   }
   #overlay .ov-close{
     position:absolute; top:18px; right:18px;
@@ -614,8 +639,8 @@
   /* --- Bottom nav --- */
   nav.tabbar{
     display:flex; flex-shrink:0;
-    border-top:1px solid var(--line);
-    background:rgba(255,255,255,0.7);
+    border-top:2px solid var(--amber);
+    background:rgba(255,255,255,0.86);
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter:blur(10px);
     padding:6px 4px calc(env(safe-area-inset-bottom, 6px) + 6px);
@@ -642,7 +667,7 @@
   <header class="topbar">
     <div>
       <div class="eyebrow" id="dateLabel">Today</div>
-      <h1 id="screenTitle">J.J.'s Class Missions</h1>
+      <h1 id="screenTitle">J.J.'s Sailing Orders</h1>
     </div>
     <div class="header-right">
       <div class="badge" id="headerBadge">Level 0</div>
@@ -653,6 +678,28 @@
   <main>
     <!-- TODAY -->
     <section class="screen active" id="screen-today">
+      <div class="ship-hero" id="shipHero">
+        <div class="ship-scene" id="shipScene"></div>
+        <div class="ship-hero-caption">RMS J.J. &middot; Today's Manifest</div>
+        <div class="deck-check">
+          <div class="deck-check-label">How's today feeling?</div>
+          <div class="deck-pill-row" id="moodRow">
+            <button class="deck-pill" data-mood="sunny">Sunny</button>
+            <button class="deck-pill" data-mood="cloudy">Cloudy</button>
+            <button class="deck-pill" data-mood="rainy">Rainy</button>
+            <button class="deck-pill" data-mood="stormy">Stormy</button>
+            <button class="deck-pill" data-mood="weird">Weird</button>
+          </div>
+          <div class="deck-check-label">Today's energy</div>
+          <div class="deck-pill-row" id="energyRow">
+            <button class="deck-pill" data-energy="empty">Empty</button>
+            <button class="deck-pill" data-energy="low">Low</button>
+            <button class="deck-pill" data-energy="med">Medium</button>
+            <button class="deck-pill" data-energy="high">High</button>
+            <button class="deck-pill" data-energy="full">Full</button>
+          </div>
+        </div>
+      </div>
       <div class="card">
         <h2>Today's small wins</h2>
         <div class="sub">Tap when it happens. No pressure to do them all.</div>
@@ -713,8 +760,8 @@
         <div class="xp-level-top">
           <div class="xp-icon-wrap" id="levelIconWrap"></div>
           <div>
-            <div class="xp-level-num pixel-font" id="xpLevelNum">LV. 1</div>
-            <div class="xp-level-sub" id="xpLevelSub">0 / 100 XP to next level</div>
+            <div class="xp-level-num pixel-font" id="xpLevelNum">RANK 1</div>
+            <div class="xp-level-sub" id="xpLevelSub">0 / 100 XP to next rank</div>
           </div>
         </div>
         <div class="progress-track" id="levelBar"></div>
@@ -725,11 +772,11 @@
           <div class="xp-icon-wrap red" id="giftIconWrap"></div>
           <div>
             <div class="xp-level-num pixel-font" id="rewardLabel">0 / 500</div>
-            <div class="xp-level-sub" id="rewardSub">XP to next reward</div>
+            <div class="xp-level-sub" id="rewardSub">XP to next crate</div>
           </div>
         </div>
         <div class="progress-track" id="rewardBar"></div>
-        <div class="rewards-earned" id="rewardsEarned">Rewards earned so far: 0</div>
+        <div class="rewards-earned" id="rewardsEarned">Crates opened so far: 0</div>
       </div>
 
       <div class="stat-row">
@@ -921,7 +968,7 @@
       <div class="card sos-card">
         <div class="sos-head">
           <div class="sos-icon-wrap" id="sosIconWrap"></div>
-          <h2>Mission Control</h2>
+          <h2>Ship's Bridge</h2>
         </div>
         <div class="sub">Not sure what's going on? Tap what's happening — there's no wrong answer.</div>
         <div id="situationList"></div>
@@ -978,149 +1025,81 @@
 (function(){
   const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
 
-  // Builds an 8-bit style sprite from a row of pixel-grid strings.
-  // Each character maps to a hex color in `pal`; '.' is transparent.
-  function px(rows, pal){
-    const h = rows.length, w = rows[0].length;
-    let rects = '';
-    for(let y = 0; y < h; y++){
-      for(let x = 0; x < w; x++){
-        const c = rows[y][x];
-        if(c !== '.' && pal[c]){
-          rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${pal[c]}"/>`;
-        }
-      }
-    }
-    return `<svg viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges">${rects}</svg>`;
+  // Clean stroke-line icon builder — blueprint style, matches the
+  // Engineering Academy hub. `c` is the stroke color; `fill` optional.
+  function ic(inner, c, opts){
+    opts = opts || {};
+    const fill = opts.fill || 'none';
+    const w = opts.weight || 1.8;
+    return `<svg viewBox="0 0 24 24" fill="${fill}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
   }
 
-  const GOLD = '#F5C542', GOLD_DK = '#F5A623', RED = '#E4453D', RED_DK = '#C62828',
-        BLUE = '#1E4FA3', GREEN = '#4CAF50', WHITE = '#FFFFFF', PURPLE = '#9B59B6',
-        PINK = '#FF6FA5', BROWN = '#A9744F', GRAY = '#8A8A8A', INK = '#16233F', ORANGE = '#F5A623';
+  const NAVY = '#0E2A45', AMBER = '#D9A441', CORAL = '#C1503A',
+        SLATE = '#5B6B78', TEALDK = '#081826', WHITE = '#FFFFFF';
 
   const ICONS = {
-    wave: px([
-      "..a.a.a.","..a.a.a.","aaaaaaa.","aaaaaaa.",
-      ".aaaaaa.",".aaaaaa.",".bbbbbb.",".bbbbbb."
-    ], {a:'#F2954D', b:BLUE}),
-    question: px([
-      ".aaaaa..","aa...aa.","....aa..","...aa...",
-      "..aa....","..aa....","........","..aa...."
-    ], {a:PURPLE}),
-    idea: px([
-      "..aaaa..",".aaaaaa.","aaaaaaaa","aaaaaaaa",
-      ".aaaaaa.","..bbbb..","..bbbb..","...bb..."
-    ], {a:GOLD, b:GRAY}),
-    heart: px([
-      ".aa.aa..","aaaaaaa.","aaaaaaaa",".aaaaaa.",
-      "..aaaa..","...aa...","........","........"
-    ], {a:RED}),
-    flag: px([
-      "a.......","abbbbbb.","abbbbbb.","abbbb...",
-      "a.......","a.......","a.......","aaa....."
-    ], {a:GRAY, b:RED}),
-    star: px([
-      "...aa...","...aa...",".a.aa.a.","aaaaaaaa",
-      ".a.aa.a.","...aa...","...aa...","........"
-    ], {a:GOLD}),
-    medal: px([
-      "..aaaa..",".aaaaaa.","aabbbbaa","aabbbbaa",
-      "aabbbbaa",".aaaaaa.","..cc.cc.",".c....c."
-    ], {a:GOLD, b:RED, c:RED_DK}),
-    gift: px([
-      "........","..a..a..","bbbccbbb","bbbccbbb",
-      "bbbccbbb","bbbccbbb","bbbccbbb","........"
-    ], {a:GOLD, b:WHITE, c:GOLD}),
-    rocket: px([
-      "...aa...","..aaaa..",".aabbaa.",".aabbaa.",
-      ".aaaaaa.","aaaaaaaa",".c....c.","..c..c.."
-    ], {a:WHITE, b:BLUE, c:RED}),
-    moon: px([
-      "..aaaa..",".aaaaaa.","aaaaaaaa","aaaaaaaa",
-      "aaaaaaaa","aaaaaaaa",".aaaaaa.","..aaaa.."
-    ], {a:'#F0EFC9'}),
-    coin: px([
-      "..aaaa..",".aabbaa.","aabbbbaa","aabbbbaa",
-      "aabbbbaa","aabbbbaa",".aabbaa.","..aaaa.."
-    ], {a:GOLD_DK, b:GOLD}),
-    eye: px([
-      "cccccccc","cbbbbbbc","cbaaaabc","cbbbbbbc",
-      "cba..abc","cbbbbbbc","cccccccc","........"
-    ], {a:WHITE, b:'#1F6B4A', c:BROWN}),
-    smile: px([
-      "..aaaa..",".aaaaaa.","aacaacaa","aaaaaaaa",
-      "aacaacaa","aaccccaa",".aaaaaa.","..aaaa.."
-    ], {a:GOLD, c:INK}),
-    megaphone: px([
-      "aaa.....","aaaa....","aaaaa...","aaaaaa..",
-      "aaaaaa..","aaaaa...","aaaa....","aaa....."
-    ], {a:ORANGE}),
-    clock: px([
-      "..aaaa..",".aaabaa.","aaaabaaa","aaaaaaaa",
-      "aaaaabba","aaaaaaaa",".aaaaaa.","..aaaa.."
-    ], {a:WHITE, b:INK}),
-    agree: px([
-      "........","......a.",".....aa.","....aa..",
-      "aa.aa...",".aaa....","..a.....","........"
-    ], {a:GREEN}),
-    marker: px([
-      ".....aa.","....aa..","...aa...","..aa....",
-      ".aa.....","aa......","a.......","........"
-    ], {a:GOLD}),
-    stairs: px([
-      "......aa","......aa","....aaaa","....aaaa",
-      "..aaaaaa","..aaaaaa","aaaaaaaa","aaaaaaaa"
-    ], {a:BLUE}),
-    friends: px([
-      ".a...b..","aaa.bbb.",".a...b..","aaa.bbb.",
-      "aaa.bbb.","aaa.bbb.","a.a.b.b.","a.a.b.b."
-    ], {a:BLUE, b:GREEN}),
-    pause: px([
-      ".aa.aa..",".aa.aa..",".aa.aa..",".aa.aa..",
-      ".aa.aa..",".aa.aa..",".aa.aa..","........"
-    ], {a:BLUE}),
-    book: px([
-      "aaabaaa.","aaabaaa.","aaabaaa.",".aabaa..",
-      ".aabaa..","..aba...","........","........"
-    ], {a:GOLD, b:BLUE}),
-    exit: px([
-      ".aaaaa..",".a...a..",".a...a..",".a..ba..",
-      ".a...a..",".a...a..",".aaaaa..","........"
-    ], {a:BROWN, b:GOLD}),
-    brain: px([
-      ".aa.aa..","aaaaaaa.","aa.a.aa.","aaaaaaa.",
-      "aa.a.aa.",".aaaaa..","..aaa...","........"
-    ], {a:PINK}),
-    sunrise: px([
-      "a.....a.",".aaaaa..","aaaaaaaa","aaaaaaaa",
-      "bbbbbbbb","........","........","........"
-    ], {a:GOLD, b:'#3F7D3A'}),
-    speech: px([
-      "aaaaaaa.","aaaaaaa.","aaaaaaa.","aaaaaaa.",
-      "aa.aa...","a.......","........","........"
-    ], {a:BLUE}),
-    clipboard: px([
-      "aaaaaaa.","aaaaaaa.","aaaaaaa.","aa.b.aa.",
-      "aab.baa.","aaaaaaa.","aaaaaaa.","........"
-    ], {a:WHITE, b:GREEN}),
-    chest: px([
-      ".aaaaaa.","aaaaaaaa","aaaaaaaa","bbbbbbbb",
-      "bb.cc.bb","bbbbbbbb","bbbbbbbb","........"
-    ], {a:GOLD, b:BROWN, c:GOLD_DK}),
-    abacus: px([
-      "aaaaaaaa","a......a","a.b..c.a","a......a",
-      "a.c..b.a","a......a","aaaaaaaa","........"
-    ], {a:BROWN, b:GOLD, c:RED}),
-    bell: px([
-      "..aaaa..",".aaaaaa.",".aaaaaa.",".aaaaaa.",
-      "aaaaaaaa","...bb...","........","........"
-    ], {a:GOLD, b:BROWN})
+    // Say Hello — signal flag
+    flag: ic('<path d="M6 21V4"/><path d="M6 5h9l-2.5 3L15 11H6"/>', AMBER),
+    // Ask Question — speech bubble w/ question mark
+    question: ic('<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 1 1 21 11.5z"/><path d="M9.5 9a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 1.9-2.4 3.4"/><line x1="12" y1="16.7" x2="12" y2="16.7"/>', NAVY),
+    // One Opinion — signal flare / idea
+    idea: ic('<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.8.7 1.3 1.4 1.4 2.5h5.2c.1-1.1.6-1.8 1.4-2.5A6 6 0 0 0 12 2z"/>', AMBER),
+    // Help Friend
+    heart: ic('<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21.2l8.8-8.7a5.5 5.5 0 0 0 0-7.9z"/>', CORAL),
+    // Finish Group Work — checkered task complete
+    finish: ic('<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/>', NAVY),
+    // Teacher Praised / compass star
+    star: ic('<polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/>', AMBER, {fill: AMBER, weight: 1.2}),
+    // Level badge — engineer's award
+    medal: ic('<circle cx="12" cy="8" r="6"/><path d="M8.2 13.5 7 22l5-3 5 3-1.2-8.5"/>', AMBER),
+    // Reward — cargo crate
+    crate: ic('<path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5"/><line x1="12" y1="22" x2="12" y2="12"/>', WHITE),
+    // Mission Control header — ship's wheel
+    wheel: ic('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/><line x1="12" y1="4" x2="12" y2="9.5"/><line x1="12" y1="14.5" x2="12" y2="20"/><line x1="4" y1="12" x2="9.5" y2="12"/><line x1="14.5" y1="12" x2="20" y2="12"/><line x1="6.3" y1="6.3" x2="9.8" y2="9.8"/><line x1="14.2" y1="14.2" x2="17.7" y2="17.7"/><line x1="17.7" y1="6.3" x2="14.2" y2="9.8"/><line x1="9.8" y1="14.2" x2="6.3" y2="17.7"/>', CORAL),
+    // Quiet mode — anchor down
+    anchor: ic('<circle cx="12" cy="5" r="2.5"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/>', '#F0EFC9'),
+    // XP token — pressure gauge
+    gauge: ic('<circle cx="12" cy="13" r="8"/><line x1="12" y1="13" x2="12" y2="8"/><circle cx="12" cy="13" r="1.3" fill="' + AMBER + '"/><line x1="9" y1="4.5" x2="9.6" y2="6"/><line x1="15" y1="4.5" x2="14.4" y2="6"/>', AMBER),
+    // Look at teacher — periscope
+    eye: ic('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>', SLATE),
+    // Nod / react
+    smile: ic('<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>', AMBER),
+    // Explain to class — foghorn
+    megaphone: ic('<path d="M3 11l17-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>', CORAL),
+    // Submit on time
+    clock: ic('<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/>', SLATE),
+    // Nod / agree check — used as ICONS.agree alias below
+    agree: ic('<path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><polyline points="22 4 12 14 9 11"/>', '#3FA37A'),
+    // Highlight keyword — grease pencil
+    marker: ic('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>', AMBER),
+    // Try a new ladder level — rope ladder / gangway
+    stairs: ic('<line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="7" y1="7" x2="17" y2="7"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="17" x2="17" y2="17"/>', NAVY),
+    // Crew mates
+    friends: ic('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>', NAVY),
+    // Take a break
+    pause: ic('<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>', SLATE),
+    // Logbook
+    book: ic('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>', AMBER),
+    // Walk away — gangway exit
+    exit: ic('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>', SLATE),
+    // Brain state — the engine
+    engine: ic('<rect x="6" y="6" width="12" height="12" rx="1.5"/><rect x="9.5" y="9.5" width="5" height="5"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>', CORAL),
+    // Today tab — sunrise over water
+    sunrise: ic('<path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.2" y1="10.2" x2="5.6" y2="11.6"/><line x1="1" y1="18" x2="23" y2="18"/><line x1="18.4" y1="11.6" x2="19.8" y2="10.2"/><path d="M2 22c2-2 4-2 6 0s4 2 6 0s4-2 6 0"/>', AMBER),
+    // Say This tab — speech bubble
+    speech: ic('<path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7a8.5 8.5 0 1 1 16.1-3.8z"/>', NAVY),
+    // Mission Control tab / big icon — life ring
+    ring: ic('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="5.5" y1="5.5" x2="9" y2="9"/><line x1="18.5" y1="5.5" x2="15" y2="9"/><line x1="5.5" y1="18.5" x2="9" y2="15"/><line x1="18.5" y1="18.5" x2="15" y2="15"/>', CORAL),
+    // Math tab — sextant / navigation tool
+    sextant: ic('<path d="M4 20 12 4l8 16"/><path d="M8 12h8"/><circle cx="12" cy="4" r="1.4" fill="' + NAVY + '"/>', NAVY),
+    // Reminders tab — ship's bell
+    bell: ic('<path d="M7 8a5 5 0 0 1 10 0c0 6 2.5 7.5 2.5 7.5h-15S7 14 7 8z"/><path d="M10.5 18.5a1.7 1.7 0 0 0 3 0"/>', AMBER)
   };
 
   const NAV_ICONS = {
     today: ICONS.sunrise, say: ICONS.speech, group: ICONS.friends,
-    check: ICONS.agree, math: ICONS.abacus, remind: ICONS.bell,
-    xp: ICONS.star, sos: ICONS.chest
+    check: ICONS.agree, math: ICONS.sextant, remind: ICONS.bell,
+    xp: ICONS.gauge, sos: ICONS.ring
   };
 
   function renderNavIcons(){
@@ -1178,14 +1157,14 @@
       let ticks = '', labels = '';
       for(let v = start; v <= end; v++){
         const x = marginX + (v - start) * stepPx;
-        ticks += `<line x1="${x}" y1="${y-8}" x2="${x}" y2="${y+8}" stroke="#7A6A52" stroke-width="1.5"/>`;
-        labels += `<text x="${x}" y="${y+26}" font-size="11" text-anchor="middle" fill="#7A6A52">${v}</text>`;
+        ticks += `<line x1="${x}" y1="${y-8}" x2="${x}" y2="${y+8}" stroke="#5B6B78" stroke-width="1.5"/>`;
+        labels += `<text x="${x}" y="${y+26}" font-size="11" text-anchor="middle" fill="#5B6B78">${v}</text>`;
         ticks += `<circle class="nl-hit" data-v="${v}" cx="${x}" cy="${y}" r="13" fill="transparent"/>`;
       }
       let marker = '';
       if(nl.current != null){
         const cx = marginX + (nl.current - start) * stepPx;
-        marker = `<circle cx="${cx}" cy="${y}" r="6" fill="#C1502B"/>`;
+        marker = `<circle cx="${cx}" cy="${y}" r="6" fill="#C1503A"/>`;
       }
       let arc = '';
       if(jumpArc){
@@ -1193,12 +1172,12 @@
         const x2 = marginX + (jumpArc.to - start) * stepPx;
         const mx = (x1 + x2) / 2;
         const diff = jumpArc.to - jumpArc.from;
-        arc = `<path d="M ${x1} ${y} Q ${mx} ${y-32} ${x2} ${y}" stroke="#3F7D3A" stroke-width="2.5" fill="none" marker-end="url(#nlArrow)"/>
-               <text x="${mx}" y="${y-38}" font-size="13" font-weight="700" text-anchor="middle" fill="#3F7D3A">${diff>0?'+':''}${diff}</text>`;
+        arc = `<path d="M ${x1} ${y} Q ${mx} ${y-32} ${x2} ${y}" stroke="#0E2A45" stroke-width="2.5" fill="none" marker-end="url(#nlArrow)"/>
+               <text x="${mx}" y="${y-38}" font-size="13" font-weight="700" text-anchor="middle" fill="#0E2A45">${diff>0?'+':''}${diff}</text>`;
       }
       const svg = `<svg viewBox="0 0 ${W} ${H}">
-        <defs><marker id="nlArrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F7D3A"/></marker></defs>
-        <line x1="${marginX}" y1="${y}" x2="${W-marginX}" y2="${y}" stroke="#7A6A52" stroke-width="2"/>
+        <defs><marker id="nlArrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0E2A45"/></marker></defs>
+        <line x1="${marginX}" y1="${y}" x2="${W-marginX}" y2="${y}" stroke="#5B6B78" stroke-width="2"/>
         ${arc}${ticks}${labels}${marker}
       </svg>`;
       el('nlSvgWrap').innerHTML = svg;
@@ -1255,7 +1234,7 @@
         const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
         const largeArc = (a1 - a0) > Math.PI ? 1 : 0;
         const fill = i < shaded ? '#F5A623' : '#FFFBF0';
-        paths += `<path d="M${cx},${cy} L${x0},${y0} A${r},${r} 0 ${largeArc} 1 ${x1},${y1} Z" fill="${fill}" stroke="#3B2A1E" stroke-width="1.5"/>`;
+        paths += `<path d="M${cx},${cy} L${x0},${y0} A${r},${r} 0 ${largeArc} 1 ${x1},${y1} Z" fill="${fill}" stroke="#16293A" stroke-width="1.5"/>`;
       }
       return `<svg viewBox="0 0 120 120">${paths}</svg>`;
     }
@@ -1310,11 +1289,11 @@
       const labelX = cx + (arcR + 18) * Math.cos(midRad);
       const labelY = cy - (arcR + 18) * Math.sin(midRad);
       const svg = `<svg viewBox="0 0 ${W} ${H}">
-        <line x1="${cx}" y1="${cy}" x2="${cx+len}" y2="${cy}" stroke="#3B2A1E" stroke-width="2.5"/>
-        <line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#3B2A1E" stroke-width="2.5"/>
-        <path d="M ${ax1} ${ay1} A ${arcR} ${arcR} 0 ${largeArc} 0 ${ax2} ${ay2}" stroke="#C1502B" stroke-width="2" fill="none"/>
-        <text x="${labelX}" y="${labelY}" font-size="14" font-weight="700" fill="#C1502B" text-anchor="middle">${deg}°</text>
-        <circle cx="${cx}" cy="${cy}" r="3.5" fill="#3B2A1E"/>
+        <line x1="${cx}" y1="${cy}" x2="${cx+len}" y2="${cy}" stroke="#16293A" stroke-width="2.5"/>
+        <line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#16293A" stroke-width="2.5"/>
+        <path d="M ${ax1} ${ay1} A ${arcR} ${arcR} 0 ${largeArc} 0 ${ax2} ${ay2}" stroke="#C1503A" stroke-width="2" fill="none"/>
+        <text x="${labelX}" y="${labelY}" font-size="14" font-weight="700" fill="#C1503A" text-anchor="middle">${deg}°</text>
+        <circle cx="${cx}" cy="${cy}" r="3.5" fill="#16293A"/>
       </svg>`;
       el('angleSvgWrap').innerHTML = svg;
     }
@@ -1343,9 +1322,9 @@
         const rw = w * scale, rh = h * scale;
         const x = (W - rw) / 2, y = (H - rh) / 2;
         svg = `<svg viewBox="0 0 ${W} ${H}">
-          <rect x="${x}" y="${y}" width="${rw}" height="${rh}" fill="rgba(63,125,58,0.15)" stroke="#3F7D3A" stroke-width="2.5"/>
-          <text x="${x+rw/2}" y="${y-10}" font-size="13" text-anchor="middle" fill="#3B2A1E">${w}</text>
-          ${type==='rect' ? `<text x="${x-16}" y="${y+rh/2}" font-size="13" text-anchor="middle" fill="#3B2A1E" transform="rotate(-90 ${x-16} ${y+rh/2})">${h}</text>` : ''}
+          <rect x="${x}" y="${y}" width="${rw}" height="${rh}" fill="rgba(14,42,69,0.15)" stroke="#0E2A45" stroke-width="2.5"/>
+          <text x="${x+rw/2}" y="${y-10}" font-size="13" text-anchor="middle" fill="#16293A">${w}</text>
+          ${type==='rect' ? `<text x="${x-16}" y="${y+rh/2}" font-size="13" text-anchor="middle" fill="#16293A" transform="rotate(-90 ${x-16} ${y+rh/2})">${h}</text>` : ''}
         </svg>`;
       } else if(type === 'triangle'){
         const b = Math.max(1, Math.min(200, parseFloat(el('shapeBase').value) || 1));
@@ -1355,10 +1334,10 @@
         const baseY = (H + bh) / 2;
         const x0 = (W - bw) / 2, topX = x0 + bw / 2, topY = baseY - bh;
         svg = `<svg viewBox="0 0 ${W} ${H}">
-          <polygon points="${x0},${baseY} ${x0+bw},${baseY} ${topX},${topY}" fill="rgba(63,125,58,0.15)" stroke="#3F7D3A" stroke-width="2.5"/>
-          <line x1="${topX}" y1="${topY}" x2="${topX}" y2="${baseY}" stroke="#C1502B" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <text x="${x0+bw/2}" y="${baseY+18}" font-size="13" text-anchor="middle" fill="#3B2A1E">base ${b}</text>
-          <text x="${topX+8}" y="${(topY+baseY)/2}" font-size="13" fill="#C1502B">height ${h}</text>
+          <polygon points="${x0},${baseY} ${x0+bw},${baseY} ${topX},${topY}" fill="rgba(14,42,69,0.15)" stroke="#0E2A45" stroke-width="2.5"/>
+          <line x1="${topX}" y1="${topY}" x2="${topX}" y2="${baseY}" stroke="#C1503A" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="${x0+bw/2}" y="${baseY+18}" font-size="13" text-anchor="middle" fill="#16293A">base ${b}</text>
+          <text x="${topX+8}" y="${(topY+baseY)/2}" font-size="13" fill="#C1503A">height ${h}</text>
         </svg>`;
       } else if(type === 'circle'){
         const r = Math.max(1, Math.min(100, parseFloat(el('shapeR').value) || 1));
@@ -1366,9 +1345,9 @@
         const rr = r * scale;
         const cx = W / 2, cy = H / 2;
         svg = `<svg viewBox="0 0 ${W} ${H}">
-          <circle cx="${cx}" cy="${cy}" r="${rr}" fill="rgba(63,125,58,0.15)" stroke="#3F7D3A" stroke-width="2.5"/>
-          <line x1="${cx}" y1="${cy}" x2="${cx+rr}" y2="${cy}" stroke="#C1502B" stroke-width="1.5"/>
-          <text x="${cx+rr/2}" y="${cy-6}" font-size="13" text-anchor="middle" fill="#C1502B">r = ${r}</text>
+          <circle cx="${cx}" cy="${cy}" r="${rr}" fill="rgba(14,42,69,0.15)" stroke="#0E2A45" stroke-width="2.5"/>
+          <line x1="${cx}" y1="${cy}" x2="${cx+rr}" y2="${cy}" stroke="#C1503A" stroke-width="1.5"/>
+          <text x="${cx+rr/2}" y="${cy-6}" font-size="13" text-anchor="middle" fill="#C1503A">r = ${r}</text>
         </svg>`;
       }
       el('shapeSvgWrap').innerHTML = svg;
@@ -1738,47 +1717,108 @@
     renderReminders();
   }
 
-  const SCENERY = {
-    tree: px([
-      "...aa...","..aaaaa.",".aaaaaaa","..aaaaa.",
-      ".aaaaaaa","..aaaaa.","...bb...","...bb..."
-    ], {a:'#3F7D3A', b:'#8B5A2B'}),
-    treeDark: px([
-      "...aa...","..aaaaa.",".aaaaaaa","..aaaaa.",
-      ".aaaaaaa","..aaaaa.","...bb...","...bb..."
-    ], {a:'#2E5F2C', b:'#6E4522'}),
-    bush: px([
-      "........","..aaaa..",".aaaaaa.","aaaaaaaa",
-      "aaaaaaaa",".aaaaaa.","........","........"
-    ], {a:'#5FA84A'}),
-    rabbit: px([
-      ".a....a.",".a....a.","..aaaa..",".aaaaaa.",
-      "aaaaaaaa","aaaaaaaa",".aa..aa.","........"
-    ], {a:'#F5EFE0'})
+  const DECK_SKY = {
+    sunny: {
+      bg: '#EAF6FF',
+      extra: '<circle cx="285" cy="20" r="9" fill="#D9A441"/><line x1="285" y1="4" x2="285" y2="9" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/><line x1="285" y1="31" x2="285" y2="36" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/><line x1="269" y1="20" x2="274" y2="20" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/><line x1="296" y1="20" x2="301" y2="20" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/>',
+      wave: '#3F7191'
+    },
+    cloudy: {
+      bg: '#DCE3E8',
+      extra: '<ellipse cx="270" cy="20" rx="16" ry="8" fill="#FFFFFF"/><ellipse cx="285" cy="16" rx="12" ry="7" fill="#FFFFFF"/><ellipse cx="55" cy="16" rx="14" ry="7" fill="#FFFFFF" opacity="0.85"/>',
+      wave: '#3F7191'
+    },
+    rainy: {
+      bg: '#C7D2D9',
+      extra: '<ellipse cx="270" cy="18" rx="16" ry="8" fill="#B8C4CC"/><ellipse cx="285" cy="14" rx="12" ry="7" fill="#B8C4CC"/><ellipse cx="55" cy="16" rx="14" ry="7" fill="#B8C4CC" opacity="0.85"/><line x1="262" y1="30" x2="258" y2="39" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line x1="275" y1="30" x2="271" y2="41" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line x1="288" y1="28" x2="284" y2="38" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line x1="47" y1="27" x2="43" y2="37" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line x1="60" y1="27" x2="56" y2="38" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/>',
+      wave: '#2C5870'
+    },
+    stormy: {
+      bg: '#16324A',
+      extra: '<circle cx="270" cy="18" r="7" fill="#F1ECDD" opacity="0.85"/><circle cx="30" cy="14" r="1.6" fill="#F1ECDD"/><circle cx="45" cy="22" r="1.2" fill="#F1ECDD"/><circle cx="230" cy="12" r="1.4" fill="#F1ECDD"/>',
+      wave: '#2C5870'
+    },
+    weird: {
+      bg: '#E8DFF5',
+      extra: '<circle cx="60" cy="18" r="22" fill="#D9F0E8" opacity="0.7"/><path d="M280 8 q9 0 9 9 q0 7 -7 7 q-5 0 -5 -5 q0 -3 3 -3" stroke="#8B6DB8" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M232 12 l3 3 M235 12 l-3 3" stroke="#D9A441" stroke-width="1.8" stroke-linecap="round"/><path d="M18 30 l3 3 M21 30 l-3 3" stroke="#8B6DB8" stroke-width="1.8" stroke-linecap="round"/>',
+      wave: '#8B6DB8'
+    }
   };
 
-  function renderScene(){
-    const scene = document.getElementById('scene');
-    if(!scene) return;
-    const items = [
-      {icon:'tree', left:'4%',  top:'14%', size:34},
-      {icon:'bush', left:'14%', top:'24%', size:20},
-      {icon:'treeDark', left:'80%', top:'10%', size:40},
-      {icon:'tree', left:'90%', top:'20%', size:26},
-      {icon:'bush', left:'60%', top:'22%', size:18},
-      {icon:'rabbit', left:'34%', top:'26%', size:18}
-    ];
-    scene.innerHTML = items.map(it =>
-      `<div style="position:absolute; left:${it.left}; top:${it.top}; width:${it.size}px; height:${it.size}px;">${SCENERY[it.icon]}</div>`
-    ).join('');
+  function shipSceneSVG(mood, energy){
+    const sky = DECK_SKY[mood] || DECK_SKY.sunny;
+    const waveColor = sky.wave;
+
+    const litCount = {empty:0, low:2, med:4, high:6, full:8}[energy] ?? 0;
+    const portholeXs = [75, 100, 125, 150, 175, 200, 225, 250];
+    const portholes = portholeXs.map((x, i) => {
+      const lit = i < litCount;
+      return `<circle cx="${x}" cy="82" r="4.5" fill="${lit ? '#D9A441' : 'none'}" stroke="#D9A441" stroke-width="1.6"${lit ? ' opacity="0.95"' : ''}/>`;
+    }).join('');
+
+    return `<svg viewBox="0 0 320 130">
+      <rect x="0" y="0" width="320" height="130" fill="${sky.bg}"/>
+      ${sky.extra}
+      <path class="wave-path" d="M10 122 q8 -6 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0" fill="none" stroke="${waveColor}" stroke-width="2" stroke-linecap="round"/>
+      <line x1="15" y1="112" x2="305" y2="112" stroke="#0E2A45" stroke-width="1.2" stroke-dasharray="5 5" opacity="0.5"/>
+      <path d="M30 95 L52 60 L268 60 L290 95 Q290 109 273 109 L47 109 Q30 109 30 95 Z" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2.5" stroke-linejoin="round"/>
+      ${portholes}
+      <rect x="108" y="34" width="104" height="27" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
+      <rect x="120" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+      <rect x="134" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+      <rect x="148" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+      <rect x="162" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+      <rect x="176" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+      <rect x="190" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+      <rect x="150" y="8" width="16" height="29" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
+      <rect x="150" y="8" width="16" height="8" fill="#D9A441"/>
+      <rect x="178" y="8" width="16" height="29" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
+      <rect x="178" y="8" width="16" height="8" fill="#D9A441"/>
+      <line x1="56" y1="60" x2="56" y2="30" stroke="#0E2A45" stroke-width="2"/>
+      <path d="M56 30 L74 36 L56 42 Z" fill="#C1503A"/>
+    </svg>`;
+  }
+
+  function renderShipScene(){
+    const wrap = el('shipScene');
+    if(!wrap) return;
+    wrap.innerHTML = shipSceneSVG(state.deckMood, state.deckEnergy);
+  }
+
+  function updateDeckPills(){
+    document.querySelectorAll('#moodRow .deck-pill').forEach(b => {
+      b.classList.toggle('selected', b.dataset.mood === state.deckMood);
+    });
+    document.querySelectorAll('#energyRow .deck-pill').forEach(b => {
+      b.classList.toggle('selected', b.dataset.energy === state.deckEnergy);
+    });
+  }
+
+  function wireDeckControls(){
+    document.querySelectorAll('#moodRow .deck-pill').forEach(btn => {
+      btn.onclick = async () => {
+        state.deckMood = btn.dataset.mood;
+        updateDeckPills();
+        renderShipScene();
+        await saveJSON(todayKey('deck-mood'), {v: state.deckMood});
+      };
+    });
+    document.querySelectorAll('#energyRow .deck-pill').forEach(btn => {
+      btn.onclick = async () => {
+        state.deckEnergy = btn.dataset.energy;
+        updateDeckPills();
+        renderShipScene();
+        await saveJSON(todayKey('deck-energy'), {v: state.deckEnergy});
+      };
+    });
   }
 
   const XP_ACTIONS = [
-    {id:'hello', label:'Say Hello', xp:5, icon:'wave'},
+    {id:'hello', label:'Say Hello', xp:5, icon:'flag'},
     {id:'question', label:'Ask Question', xp:10, icon:'question'},
     {id:'opinion', label:'One Opinion', xp:15, icon:'idea'},
     {id:'help', label:'Help Friend', xp:20, icon:'heart'},
-    {id:'group', label:'Finish Group Work', xp:20, icon:'flag'},
+    {id:'group', label:'Finish Group Work', xp:20, icon:'finish'},
     {id:'praise', label:'Teacher Praised', xp:50, icon:'star'}
   ];
 
@@ -1819,7 +1859,7 @@
   }
 
   const MISSIONS = [
-    {id:'hello', text:'Say hi to the teacher', xp:5, icon:'wave'},
+    {id:'hello', text:'Say hi to the teacher', xp:5, icon:'flag'},
     {id:'ready', text:'Have your book / iPad ready before the bell', xp:5, icon:'book'},
     {id:'look', text:'Look up when someone is talking', xp:5, icon:'eye'},
     {id:'keyword', text:'Highlight one keyword in your notes', xp:5, icon:'marker'},
@@ -1851,7 +1891,7 @@
   ];
 
   const CHECK_ITEMS = [
-    {id:'hand', en:'Raise hand once', xp:10, icon:'wave'},
+    {id:'hand', en:'Raise hand once', xp:10, icon:'flag'},
     {id:'ask', en:'Ask 1 question', xp:10, icon:'question'},
     {id:'help', en:'Help a friend once', xp:10, icon:'friends'},
     {id:'submit', en:'Submit work on time', xp:10, icon:'clock'},
@@ -1960,7 +2000,9 @@
     xpWeek: 0,
     xpActionsToday: {},
     quietMode: false,
-    reminders: []
+    reminders: [],
+    deckMood: 'sunny',
+    deckEnergy: 'med'
   };
 
   const el = id => document.getElementById(id);
@@ -2076,7 +2118,7 @@
       wrap.appendChild(card);
     });
     const done = document.createElement('div');
-    done.style.cssText = 'text-align:center; font-family:IBM Plex Mono,monospace; font-size:12px; color:var(--ink-soft); padding-top:4px; letter-spacing:0.1em;';
+    done.style.cssText = 'text-align:center; font-family:Space Mono,monospace; font-size:12px; color:var(--ink-soft); padding-top:4px; letter-spacing:0.1em;';
     done.textContent = 'DONE';
     wrap.appendChild(done);
     el('groupShowBtn').onclick = () => {
@@ -2110,7 +2152,7 @@
   function buildBrainBlock(block){
     const div = document.createElement('div');
     div.className = 'brain-note';
-    div.innerHTML = `${ICONS.brain}<p>${block.text}</p>`;
+    div.innerHTML = `${ICONS.engine}<p>${block.text}</p>`;
     return div;
   }
 
@@ -2303,7 +2345,7 @@
   };
 
   function renderSOS(){
-    el('sosIconWrap').innerHTML = ICONS.rocket;
+    el('sosIconWrap').innerHTML = ICONS.wheel;
     const wrap = el('situationList');
     wrap.innerHTML = '';
     SITUATIONS.forEach(sit => {
@@ -2349,19 +2391,19 @@
     const rewardProgress = state.xpLifetime % 500;
     const rewardsEarned = Math.floor(state.xpLifetime / 500);
 
-    el('xpLevelNum').textContent = 'LV. ' + level;
-    el('xpLevelSub').textContent = intoLevel + ' / 100 XP to next level';
+    el('xpLevelNum').textContent = 'RANK ' + level;
+    el('xpLevelSub').textContent = intoLevel + ' / 100 XP to next rank';
     renderMeter('levelBar', (intoLevel / 100) * 100);
 
     el('rewardLabel').textContent = rewardProgress + ' / 500';
     renderMeter('rewardBar', (rewardProgress / 500) * 100);
-    el('rewardsEarned').textContent = 'Rewards earned so far: ' + rewardsEarned;
+    el('rewardsEarned').textContent = 'Crates opened so far: ' + rewardsEarned;
 
-    el('xpTodayNum').innerHTML = ICONS.coin + '<span>' + state.xpToday + '</span>';
-    el('xpWeekNum').innerHTML = ICONS.coin + '<span>' + state.xpWeek + '</span>';
+    el('xpTodayNum').innerHTML = ICONS.gauge + '<span>' + state.xpToday + '</span>';
+    el('xpWeekNum').innerHTML = ICONS.gauge + '<span>' + state.xpWeek + '</span>';
 
     el('levelIconWrap').innerHTML = ICONS.medal;
-    el('giftIconWrap').innerHTML = ICONS.gift;
+    el('giftIconWrap').innerHTML = ICONS.crate;
     updateHeaderBadge();
   }
 
@@ -2392,7 +2434,7 @@
     const rect = originEl.getBoundingClientRect();
     const f = document.createElement('div');
     f.className = 'xp-float';
-    f.innerHTML = ICONS.coin + '<span>+' + amount + '</span>';
+    f.innerHTML = ICONS.gauge + '<span>+' + amount + '</span>';
     f.style.left = (rect.left + rect.width/2 - 24) + 'px';
     f.style.top = (rect.top + 6) + 'px';
     document.body.appendChild(f);
@@ -2469,7 +2511,7 @@
   el('overlay').onclick = hideOverlay;
   el('ovClose').onclick = (e) => { e.stopPropagation(); hideOverlay(); };
 
-  const TITLES = {today:"J.J.'s Class Missions", say:'Say This', group:'Group Work', check:'Visibility Check', math:'Math Notes', remind:'Reminders', xp:'XP Board', sos:'Mission Control'};
+  const TITLES = {today:"J.J.'s Sailing Orders", say:'Say This', group:'Group Work', check:'Visibility Check', math:'Math Notes', remind:'Reminders', xp:'Engine Room', sos:"Ship's Bridge"};
   document.querySelectorAll('nav.tabbar button').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.remove('active'));
@@ -2491,7 +2533,6 @@
   });
 
   async function init(){
-    renderScene();
     renderNavIcons();
     initMathTools();
     el('dateLabel').textContent = fmtDate();
@@ -2513,14 +2554,24 @@
     state.xpActionsToday = await loadJSON(todayKey('xp-actions'), {});
     state.reminders = await loadJSON('reminders', []);
 
+    const deckMood = await loadJSON(todayKey('deck-mood'), {v:'sunny'});
+    state.deckMood = deckMood.v || 'sunny';
+    const deckEnergy = await loadJSON(todayKey('deck-energy'), {v:'med'});
+    state.deckEnergy = deckEnergy.v || 'med';
+    renderShipScene();
+    updateDeckPills();
+    wireDeckControls();
+
     const quiet = await loadJSON('quiet-mode', {v:false});
     state.quietMode = !!quiet.v;
+    el('shipHero').classList.toggle('no-motion', state.quietMode);
     const qBtn = el('quietToggle');
-    qBtn.innerHTML = ICONS.moon;
+    qBtn.innerHTML = ICONS.anchor;
     qBtn.classList.toggle('on', state.quietMode);
     qBtn.onclick = async () => {
       state.quietMode = !state.quietMode;
       qBtn.classList.toggle('on', state.quietMode);
+      el('shipHero').classList.toggle('no-motion', state.quietMode);
       await saveJSON('quiet-mode', {v: state.quietMode});
       updateHeaderBadge();
     };
