@@ -586,12 +586,6 @@
     background:var(--moss); color:white; border-radius:9px; font-size:10px; font-weight:700;
     display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace;
   }
-  .xp-action-undo{
-    position:absolute; top:6px; left:6px; width:18px; height:18px; border-radius:50%;
-    background:rgba(14,42,69,0.14); border:1px solid rgba(14,42,69,0.35);
-    color:var(--ink); font-size:12px; font-weight:700; line-height:16px;
-    text-align:center;
-  }
   .xp-action-btn.bump{animation:bump .3s ease;}
   @keyframes bump{0%{transform:scale(1);} 40%{transform:scale(1.08);} 100%{transform:scale(1);}}
 
@@ -1666,6 +1660,7 @@
       });
       await saveReminders();
       renderReminders();
+      await adjustXP(5);
       el('remindWhat').value = '';
       el('remindClass').value = '';
       el('remindClassOther').value = '';
@@ -1698,6 +1693,7 @@
           await navigator.share({title: "J.J.'s Reminders", text});
           el('remindSummary').textContent = '';
           el('remindShareText').style.display = 'none';
+          await adjustXP(8);
           return;
         }catch(e){ /* cancelled — fall through to showing the text */ }
       }
@@ -1707,6 +1703,7 @@
       try{
         await navigator.clipboard.writeText(text);
         el('remindSummary').textContent = 'Copied! Paste it into LINE or Messages to send.';
+        await adjustXP(8);
       }catch(e){
         el('remindSummary').textContent = 'Tap the text below and copy it to send.';
         box.focus();
@@ -1801,6 +1798,11 @@
         updateDeckPills();
         renderShipScene();
         await saveJSON(todayKey('deck-mood'), {v: state.deckMood});
+        if(!state.moodXPGiven){
+          state.moodXPGiven = true;
+          await saveJSON(todayKey('mood-xp'), {v: true});
+          await adjustXP(5);
+        }
       };
     });
     document.querySelectorAll('#energyRow .deck-pill').forEach(btn => {
@@ -1809,6 +1811,11 @@
         updateDeckPills();
         renderShipScene();
         await saveJSON(todayKey('deck-energy'), {v: state.deckEnergy});
+        if(!state.energyXPGiven){
+          state.energyXPGiven = true;
+          await saveJSON(todayKey('energy-xp'), {v: true});
+          await adjustXP(5);
+        }
       };
     });
   }
@@ -2002,7 +2009,12 @@
     quietMode: false,
     reminders: [],
     deckMood: 'sunny',
-    deckEnergy: 'med'
+    deckEnergy: 'med',
+    missionsXPGiven: {},
+    checksXPGiven: {},
+    sosXPGiven: false,
+    moodXPGiven: false,
+    energyXPGiven: false
   };
 
   const el = id => document.getElementById(id);
@@ -2025,8 +2037,12 @@
         state.missions[m.id] = nowDone;
         await saveJSON(todayKey('missions'), state.missions);
         renderMissions();
-        await adjustXP(nowDone ? m.xp : -m.xp);
-        if(nowDone) popFloatXP(row, m.xp);
+        if(nowDone && !state.missionsXPGiven[m.id]){
+          state.missionsXPGiven[m.id] = true;
+          await saveJSON(todayKey('missions-xp'), state.missionsXPGiven);
+          await adjustXP(m.xp);
+          popFloatXP(row, m.xp);
+        }
       };
       wrap.appendChild(row);
     });
@@ -2140,8 +2156,12 @@
         state.checks[c.id] = nowDone;
         await saveJSON(todayKey('checks'), state.checks);
         renderChecks();
-        await adjustXP(nowDone ? c.xp : -c.xp);
-        if(nowDone) popFloatXP(row, c.xp);
+        if(nowDone && !state.checksXPGiven[c.id]){
+          state.checksXPGiven[c.id] = true;
+          await saveJSON(todayKey('checks-xp'), state.checksXPGiven);
+          await adjustXP(c.xp);
+          popFloatXP(row, c.xp);
+        }
       };
       wrap.appendChild(row);
     });
@@ -2358,7 +2378,15 @@
         <div class="situation-icon">${ICONS[sit.icon]}</div>
         <div class="situation-label">${sit.label}</div>
         <svg class="situation-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
-      head.onclick = () => card.classList.toggle('open');
+      head.onclick = async () => {
+        const opening = !card.classList.contains('open');
+        card.classList.toggle('open');
+        if(opening && !state.sosXPGiven){
+          state.sosXPGiven = true;
+          await saveJSON(todayKey('sos-xp'), {v: true});
+          await adjustXP(5);
+        }
+      };
 
       const detail = document.createElement('div');
       detail.className = 'situation-detail';
@@ -2416,15 +2444,10 @@
       btn.className = 'xp-action-btn pixel-tile';
       btn.innerHTML = `
         ${count > 0 ? `<div class="xp-action-count">×${count}</div>` : ''}
-        ${count > 0 ? `<div class="xp-action-undo">−</div>` : ''}
         <div class="xp-action-icon">${ICONS[a.icon]}</div>
         <div class="xp-action-label">${a.label}</div>
         <div class="xp-action-value">+${a.xp} XP</div>`;
       btn.onclick = (e) => logXP(a, btn);
-      const undoEl = btn.querySelector('.xp-action-undo');
-      if(undoEl){
-        undoEl.onclick = (e) => { e.stopPropagation(); undoXP(a); };
-      }
       wrap.appendChild(btn);
     });
   }
@@ -2474,15 +2497,6 @@
     popFloatXP(btnEl, action.xp);
     btnEl.classList.add('bump');
     setTimeout(() => btnEl.classList.remove('bump'), 300);
-  }
-
-  async function undoXP(action){
-    const count = state.xpActionsToday[action.id] || 0;
-    if(count <= 0) return;
-    state.xpActionsToday[action.id] = count - 1;
-    await saveJSON(todayKey('xp-actions'), state.xpActionsToday);
-    await adjustXP(-action.xp);
-    renderXPGrid();
   }
 
   let timerInterval = null;
@@ -2537,6 +2551,7 @@
     initMathTools();
     el('dateLabel').textContent = fmtDate();
     state.missions = await loadJSON(todayKey('missions'), {});
+    state.missionsXPGiven = await loadJSON(todayKey('missions-xp'), {});
     const ladderToday = await loadJSON(todayKey('ladder'), {v:0});
     state.ladderToday = ladderToday.v || 0;
     const best = await loadJSON('ladder-best', {v:0});
@@ -2544,6 +2559,7 @@
     const watermark = await loadJSON(todayKey('ladder-xp-watermark'), {v:0});
     state.ladderXPWatermark = watermark.v || 0;
     state.checks = await loadJSON(todayKey('checks'), {});
+    state.checksXPGiven = await loadJSON(todayKey('checks-xp'), {});
 
     const lifetime = await loadJSON('xp-lifetime', {v:0});
     state.xpLifetime = lifetime.v || 0;
@@ -2558,6 +2574,12 @@
     state.deckMood = deckMood.v || 'sunny';
     const deckEnergy = await loadJSON(todayKey('deck-energy'), {v:'med'});
     state.deckEnergy = deckEnergy.v || 'med';
+    const sosXP = await loadJSON(todayKey('sos-xp'), {v:false});
+    state.sosXPGiven = !!sosXP.v;
+    const moodXP = await loadJSON(todayKey('mood-xp'), {v:false});
+    state.moodXPGiven = !!moodXP.v;
+    const energyXP = await loadJSON(todayKey('energy-xp'), {v:false});
+    state.energyXPGiven = !!energyXP.v;
     renderShipScene();
     updateDeckPills();
     wireDeckControls();
