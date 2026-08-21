@@ -639,6 +639,11 @@
     -webkit-backdrop-filter:blur(10px);
     padding:6px 4px calc(env(safe-area-inset-bottom, 6px) + 6px);
   }
+  #versionStamp{
+    position:absolute; bottom:2px; right:6px; z-index:5;
+    font-family:var(--mono); font-size:8.5px; color:rgba(14,42,69,0.28);
+    pointer-events:none;
+  }
   nav.tabbar button{
     flex:1; background:none; border:none; padding:8px 2px 4px;
     display:flex; flex-direction:column; align-items:center; gap:4px;
@@ -780,7 +785,7 @@
 
       <div class="card">
         <h2>Earn XP</h2>
-        <div class="sub">Tap when it happens in class. Tap the small − if you tapped by mistake.</div>
+        <div class="sub">Tap when it happens in class.</div>
         <div class="xp-grid" id="xpGrid"></div>
       </div>
     </section>
@@ -1004,6 +1009,7 @@
       Help
     </button>
   </nav>
+  <div id="versionStamp"></div>
 
   <div id="overlay">
     <div class="ov-close" id="ovClose">
@@ -1017,6 +1023,7 @@
 
 <script>
 (function(){
+  const APP_VERSION = '2026-08-21.2';
   const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
 
   // Clean stroke-line icon builder — blueprint style, matches the
@@ -1857,12 +1864,12 @@
 
   async function loadJSON(key, fallback){
     try{
-      const r = await window.storage.get(key);
-      return r ? JSON.parse(r.value) : fallback;
+      const raw = localStorage.getItem('pc:' + key);
+      return raw !== null ? JSON.parse(raw) : fallback;
     }catch(e){ return fallback; }
   }
   async function saveJSON(key, val){
-    try{ await window.storage.set(key, JSON.stringify(val)); }catch(e){}
+    try{ localStorage.setItem('pc:' + key, JSON.stringify(val)); }catch(e){}
   }
 
   const MISSIONS = [
@@ -2550,6 +2557,8 @@
     renderNavIcons();
     initMathTools();
     el('dateLabel').textContent = fmtDate();
+    const vs = el('versionStamp');
+    if(vs) vs.textContent = 'v' + APP_VERSION;
     state.missions = await loadJSON(todayKey('missions'), {});
     state.missionsXPGiven = await loadJSON(todayKey('missions-xp'), {});
     const ladderToday = await loadJSON(todayKey('ladder'), {v:0});
