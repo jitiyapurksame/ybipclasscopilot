@@ -291,6 +291,18 @@
   .check-en{font-size:12px; color:var(--ink-soft);}
 
   /* --- Math Notes --- */
+  /* Generic subtab pattern, reused by Talk Tools and Check-In (same look as Math tabs) */
+  .subtab-row{display:flex; flex-wrap:wrap; gap:8px; padding:2px 2px 10px; margin-bottom:2px;}
+  .subtab-btn{
+    flex:1 1 auto; padding:9px 12px; border-radius:20px;
+    background:var(--card); border:1.5px solid var(--line);
+    font-size:12.5px; font-weight:700; cursor:pointer; color:var(--ink-soft);
+    font-family:'Inter',sans-serif; text-align:center; white-space:nowrap;
+  }
+  .subtab-btn.active{background:var(--moss); color:white; border-color:var(--moss);}
+  .subtab-panel{display:none;}
+  .subtab-panel.active{display:block;}
+
   .math-subtabs{display:flex; flex-wrap:wrap; gap:8px; padding:2px 2px 10px; margin-bottom:2px;}
   .math-subtab{
     flex:1 1 auto; padding:9px 12px; border-radius:20px;
@@ -379,6 +391,10 @@
     font-size:12.5px; font-weight:700; color:var(--ink-soft); cursor:pointer; font-family:'Inter',sans-serif;
   }
   .remind-type-chip.selected{background:var(--moss); color:white; border-color:var(--moss);}
+  .remind-what-chip{
+    padding:9px 14px; border-radius:20px; background:var(--card); border:1.5px solid var(--line);
+    font-size:12.5px; font-weight:700; color:var(--ink-soft); cursor:pointer; font-family:'Inter',sans-serif;
+  }
   .remind-form{display:flex; flex-direction:column; gap:12px; margin-bottom:6px;}
   .remind-form label{
     display:flex; flex-direction:column; gap:5px; font-size:11px; font-weight:700;
@@ -567,6 +583,23 @@
   .stat-label{font-size:11.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.06em; margin-top:8px;}
 
   .xp-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+
+  /* --- Badges (Trophy Hall) --- */
+  .badge-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .badge-tile{
+    background:var(--card); border:1.5px solid var(--line); border-radius:14px;
+    padding:14px 10px; text-align:center;
+  }
+  .badge-tile.locked{opacity:0.45;}
+  .badge-icon{
+    width:40px; height:40px; margin:0 auto 8px; border-radius:50%;
+    background:var(--amber-light);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .badge-tile.locked .badge-icon{background:rgba(91,107,120,0.14);}
+  .badge-icon svg{width:22px; height:22px;}
+  .badge-title{font-size:12.5px; font-weight:700; color:var(--ink); line-height:1.25;}
+  .badge-desc{font-size:11px; color:var(--ink-soft); margin-top:4px; line-height:1.3;}
   .xp-action-btn{
     position:relative; background:var(--card); border:1.5px solid var(--line);
     padding:14px 10px 12px; text-align:center; cursor:pointer;
@@ -704,52 +737,67 @@
         <div class="sub">Tap when it happens. No pressure to do them all.</div>
         <div id="missionList"></div>
       </div>
-      <div class="card">
-        <h2>The Ladder</h2>
-        <div class="sub">Tap the highest step you reached today.</div>
-        <div class="trail" id="ladderList"></div>
+      <div class="card" id="todayRemindCard">
+        <h2>On your list</h2>
+        <div class="sub">Reminders you saved. Tap to tick off when it's done.</div>
+        <div id="todayRemindList"></div>
       </div>
     </section>
 
-    <!-- SAY THIS -->
-    <section class="screen" id="screen-say">
+    <!-- TALK TOOLS (Say This + Group Work merged) -->
+    <section class="screen" id="screen-talk">
       <div class="card">
-        <h2>Say This</h2>
-        <div class="sub">Tap a line to show it full screen — say it, or hold up the iPad.</div>
-        <div class="phrase-group-title" id="grpTitle-start">Start talking</div>
-        <div id="grp-start"></div>
-        <div class="phrase-group-title" id="grpTitle-respond">Respond to someone</div>
-        <div id="grp-respond"></div>
-        <div class="phrase-group-title" id="grpTitle-moment">Need a moment</div>
-        <div id="grp-moment"></div>
-        <div class="phrase-group-title">Finish your sentence</div>
-        <div class="compose-box">
-          <textarea id="sayCompose" rows="3" placeholder="Tap a starter above, then type the rest of your idea here..."></textarea>
-          <button id="sayShowBtn" class="compose-show-btn">Show full screen</button>
+        <h2>Talk Tools</h2>
+        <div class="sub">Pick the kind of talking you need help with, tap a line to show it full screen.</div>
+        <div class="subtab-row">
+          <button class="subtab-btn active" data-tab="say">Say This</button>
+          <button class="subtab-btn" data-tab="group">Group Work</button>
+        </div>
+
+        <div class="subtab-panel active" data-tab-panel="say">
+          <div class="phrase-group-title" id="grpTitle-start">Start talking</div>
+          <div id="grp-start"></div>
+          <div class="phrase-group-title" id="grpTitle-respond">Respond to someone</div>
+          <div id="grp-respond"></div>
+          <div class="phrase-group-title" id="grpTitle-moment">Need a moment</div>
+          <div id="grp-moment"></div>
+          <div class="phrase-group-title">Finish your sentence</div>
+          <div class="compose-box">
+            <textarea id="sayCompose" rows="3" placeholder="Tap a starter above, then type the rest of your idea here..."></textarea>
+            <button id="sayShowBtn" class="compose-show-btn">Show full screen</button>
+          </div>
+        </div>
+
+        <div class="subtab-panel" data-tab-panel="group">
+          <div id="groupSteps"></div>
+          <div class="phrase-group-title">Add your own details</div>
+          <div class="compose-box">
+            <textarea id="groupCompose" rows="3" placeholder="Tap a line above, then finish it — e.g. I can write about..."></textarea>
+            <button id="groupShowBtn" class="compose-show-btn">Show full screen</button>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- GROUP WORK -->
-    <section class="screen" id="screen-group">
-      <div class="card">
-        <h2>Group Work Survival Guide</h2>
-        <div class="sub">Four moments. One line for each.</div>
-        <div id="groupSteps"></div>
-        <div class="phrase-group-title">Add your own details</div>
-        <div class="compose-box">
-          <textarea id="groupCompose" rows="3" placeholder="Tap a line above, then finish it — e.g. I can write about..."></textarea>
-          <button id="groupShowBtn" class="compose-show-btn">Show full screen</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- CHECK -->
+    <!-- CHECK-IN (Ladder + Visibility Check merged) -->
     <section class="screen" id="screen-check">
       <div class="card">
-        <h2>Teacher Visibility Check</h2>
-        <div class="sub">Five ways to be seen today. Tick when done.</div>
-        <div id="checkList"></div>
+        <h2>Check-In</h2>
+        <div class="sub">Two quick ways to check how today's going.</div>
+        <div class="subtab-row">
+          <button class="subtab-btn active" data-tab="ladder">The Ladder</button>
+          <button class="subtab-btn" data-tab="visibility">Visibility</button>
+        </div>
+
+        <div class="subtab-panel active" data-tab-panel="ladder">
+          <div class="sub">Tap the highest step you reached today.</div>
+          <div class="trail" id="ladderList"></div>
+        </div>
+
+        <div class="subtab-panel" data-tab-panel="visibility">
+          <div class="sub">Five ways to be seen today. Tick when done.</div>
+          <div id="checkList"></div>
+        </div>
       </div>
     </section>
 
@@ -787,6 +835,12 @@
         <h2>Earn XP</h2>
         <div class="sub">Tap when it happens in class.</div>
         <div class="xp-grid" id="xpGrid"></div>
+      </div>
+
+      <div class="card">
+        <h2>Badges</h2>
+        <div class="sub">A few things worth noticing. Check whenever you feel like it — no rush.</div>
+        <div class="badge-grid" id="badgeGrid"></div>
       </div>
     </section>
 
@@ -923,6 +977,18 @@
           <button class="remind-type-chip" data-type="group">Group work</button>
         </div>
         <div class="remind-form">
+          <div>
+            <div class="deck-check-label" style="margin:0 0 6px;">Quick fill (optional)</div>
+            <div class="remind-type-row" id="remindWhatPills">
+              <button class="remind-what-chip" data-what="Homework on ">Homework on</button>
+              <button class="remind-what-chip" data-what="Find information on ">Find info on</button>
+              <button class="remind-what-chip" data-what="Search for ">Search for</button>
+              <button class="remind-what-chip" data-what="Take photo of ">Take photo of</button>
+              <button class="remind-what-chip" data-what="Write ">Write</button>
+              <button class="remind-what-chip" data-what="Check MS Teams">Check MS Teams</button>
+              <button class="remind-what-chip" data-what="">My own…</button>
+            </div>
+          </div>
           <label>What <input type="text" id="remindWhat" placeholder="e.g. recorder, poster, notes"></label>
           <label>Class / Subject
             <select id="remindClass">
@@ -980,17 +1046,13 @@
       <span class="nav-icon" data-nav-icon="today"></span>
       Today
     </button>
-    <button data-screen="say">
-      <span class="nav-icon" data-nav-icon="say"></span>
-      Say This
-    </button>
-    <button data-screen="group">
-      <span class="nav-icon" data-nav-icon="group"></span>
-      Group
+    <button data-screen="talk">
+      <span class="nav-icon" data-nav-icon="talk"></span>
+      Talk
     </button>
     <button data-screen="check">
       <span class="nav-icon" data-nav-icon="check"></span>
-      Check
+      Check-In
     </button>
     <button data-screen="math">
       <span class="nav-icon" data-nav-icon="math"></span>
@@ -1002,7 +1064,7 @@
     </button>
     <button data-screen="xp">
       <span class="nav-icon" data-nav-icon="xp"></span>
-      XP
+      Trophy
     </button>
     <button data-screen="sos" class="sos-tab">
       <span class="nav-icon" data-nav-icon="sos"></span>
@@ -1023,7 +1085,7 @@
 
 <script>
 (function(){
-  const APP_VERSION = '2026-08-21.2';
+  const APP_VERSION = '2026-09-08.4';
   const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
 
   // Clean stroke-line icon builder — blueprint style, matches the
@@ -1098,9 +1160,9 @@
   };
 
   const NAV_ICONS = {
-    today: ICONS.sunrise, say: ICONS.speech, group: ICONS.friends,
+    today: ICONS.sunrise, talk: ICONS.speech,
     check: ICONS.agree, math: ICONS.sextant, remind: ICONS.bell,
-    xp: ICONS.gauge, sos: ICONS.ring
+    xp: ICONS.medal, sos: ICONS.ring
   };
 
   function renderNavIcons(){
@@ -1599,6 +1661,7 @@
     wrap.innerHTML = '';
     if(list.length === 0){
       wrap.innerHTML = '<div class="remind-empty">No reminders yet — add one above.</div>';
+      renderTodayReminders();
       return;
     }
     const todayD = todayStr();
@@ -1630,6 +1693,52 @@
       };
       wrap.appendChild(row);
     });
+    renderTodayReminders();
+  }
+
+  // Today page's own short view of unfinished reminders — tap to tick off.
+  // Keeps its own delete-free UI on purpose (deleting only happens on the
+  // Remind tab) so a stray tap on the Today page can't wipe a reminder out.
+  function renderTodayReminders(){
+    const card = el('todayRemindCard');
+    const wrap = el('todayRemindList');
+    if(!card || !wrap) return;
+    const active = state.reminders.filter(r => !r.done)
+      .slice().sort((a,b) => (a.date||'9999-99-99').localeCompare(b.date||'9999-99-99'));
+    if(active.length === 0){
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = '';
+    wrap.innerHTML = '';
+    const showCount = Math.min(active.length, 4);
+    for(let i = 0; i < showCount; i++){
+      const r = active[i];
+      const typeLabel = REMIND_LABELS[r.type] || 'Reminder';
+      const metaParts = [];
+      if(r.class) metaParts.push(escapeHTML(r.class));
+      if(r.date) metaParts.push(formatFriendlyDate(r.date));
+      const row = document.createElement('div');
+      row.className = 'remind-row';
+      row.innerHTML = `
+        <div class="remind-check">${CHECK_SVG}</div>
+        <div class="remind-info">
+          <div class="remind-title">${typeLabel}${r.what ? ': ' + escapeHTML(r.what) : ''}</div>
+          <div class="remind-meta">${metaParts.join(' · ')}</div>
+        </div>`;
+      row.onclick = async () => {
+        r.done = true;
+        await saveReminders();
+        renderReminders();
+      };
+      wrap.appendChild(row);
+    }
+    if(active.length > showCount){
+      const more = document.createElement('div');
+      more.className = 'remind-empty';
+      more.textContent = '+' + (active.length - showCount) + ' more — see the Remind tab';
+      wrap.appendChild(more);
+    }
   }
 
   function initReminders(){
@@ -1641,6 +1750,17 @@
         chips.forEach(c => c.classList.remove('selected'));
         chip.classList.add('selected');
         selectedType = chip.dataset.type;
+      };
+    });
+
+    document.querySelectorAll('#remindWhatPills .remind-what-chip').forEach(chip => {
+      chip.onclick = () => {
+        const input = el('remindWhat');
+        if(chip.dataset.what){
+          input.value = chip.dataset.what;
+        }
+        input.focus();
+        input.selectionStart = input.selectionEnd = input.value.length;
       };
     });
 
@@ -1667,6 +1787,9 @@
       });
       await saveReminders();
       renderReminders();
+      state.remindersSavedTotal += 1;
+      await saveJSON('reminders-saved-total', {v: state.remindersSavedTotal});
+      renderBadges();
       await adjustXP(5);
       el('remindWhat').value = '';
       el('remindClass').value = '';
@@ -1844,19 +1967,31 @@
     return 'week:' + d.toISOString().slice(0,10);
   }
 
+  // Named ranks — separate concept from the daily Ladder ("Level"). Rank only
+  // ever goes up (tied to lifetime XP, which never decreases). 30 hand-named
+  // tiers, then it keeps going with "Legend 2", "Legend 3"... so it never runs out.
+  const RANK_NAMES = [
+    'Cadet','Deckhand','Seaman','Engineer Mate','Junior Engineer',
+    'Engineer','Senior Engineer','Chief Engineer','Navigator','Senior Navigator',
+    'Helmsman','Bosun','First Mate','Chief Mate','Harbor Pilot',
+    'Fleet Engineer','Master Engineer','Captain','Senior Captain','Commodore',
+    'Fleet Commander','Rear Admiral','Vice Admiral','Admiral','Grand Admiral',
+    'Fleet Admiral','Master Navigator','Voyage Legend','Ocean Pioneer','Fleet Master'
+  ];
+  function getRankInfo(xpLifetime){
+    const level = Math.floor(xpLifetime / 100) + 1;
+    const idx = level - 1;
+    const name = idx < RANK_NAMES.length ? RANK_NAMES[idx] : ('Legend ' + (level - RANK_NAMES.length + 1));
+    const intoLevel = xpLifetime % 100;
+    return {level, name, intoLevel};
+  }
+
   function updateHeaderBadge(){
     const badge = el('headerBadge');
     if(state.quietMode){ badge.style.display = 'none'; return; }
-    const mode = badge.dataset.mode;
-    if(mode === 'ladder'){
-      badge.style.display = '';
-      badge.textContent = 'Level ' + state.ladderToday;
-    } else if(mode === 'xp'){
-      badge.style.display = '';
-      badge.textContent = state.xpLifetime + ' XP';
-    } else {
-      badge.style.display = 'none';
-    }
+    const info = getRankInfo(state.xpLifetime);
+    badge.style.display = '';
+    badge.textContent = info.name;
   }
 
   function todayStr(){ return new Date().toISOString().slice(0,10); }
@@ -1877,7 +2012,7 @@
     {id:'ready', text:'Have your book / iPad ready before the bell', xp:5, icon:'book'},
     {id:'look', text:'Look up when someone is talking', xp:5, icon:'eye'},
     {id:'keyword', text:'Highlight one keyword in your notes', xp:5, icon:'marker'},
-    {id:'ladder', text:'Try one new level on the ladder', xp:5, icon:'stairs'}
+    {id:'ladder', text:'Try one new level on the ladder (Check-In tab)', xp:5, icon:'stairs'}
   ];
 
   const LADDER = [
@@ -2021,7 +2156,9 @@
     checksXPGiven: {},
     sosXPGiven: false,
     moodXPGiven: false,
-    energyXPGiven: false
+    energyXPGiven: false,
+    remindersSavedTotal: 0,
+    sosEverOpened: false
   };
 
   const el = id => document.getElementById(id);
@@ -2074,6 +2211,7 @@
         if(state.ladderToday > state.ladderBest){
           state.ladderBest = state.ladderToday;
           await saveJSON('ladder-best', {v: state.ladderBest});
+          renderBadges();
         }
         await saveJSON(todayKey('ladder'), {v: state.ladderToday});
         renderLadder();
@@ -2388,10 +2526,17 @@
       head.onclick = async () => {
         const opening = !card.classList.contains('open');
         card.classList.toggle('open');
-        if(opening && !state.sosXPGiven){
-          state.sosXPGiven = true;
-          await saveJSON(todayKey('sos-xp'), {v: true});
-          await adjustXP(5);
+        if(opening){
+          if(!state.sosEverOpened){
+            state.sosEverOpened = true;
+            await saveJSON('sos-ever-opened', {v: true});
+            renderBadges();
+          }
+          if(!state.sosXPGiven){
+            state.sosXPGiven = true;
+            await saveJSON(todayKey('sos-xp'), {v: true});
+            await adjustXP(5);
+          }
         }
       };
 
@@ -2420,13 +2565,55 @@
     }
   }
 
+  // Badges — quiet, collectible, no pop-ups or comparisons. Each is unlocked
+  // by a lifetime count that only ever goes up, same spirit as XP itself.
+  // Check function reads from `state`, so it's always evaluated fresh.
+  const BADGES = [
+    {id:'first-xp', icon:'gauge', title:'First Steam', desc:"Earned your first XP.",
+      unlocked: s => s.xpLifetime >= 1},
+    {id:'rank10', icon:'medal', title:'Rank 10', desc:'Reached Senior Navigator.',
+      unlocked: s => getRankInfo(s.xpLifetime).level >= 10},
+    {id:'rank20', icon:'star', title:'Rank 20', desc:'Reached Commodore.',
+      unlocked: s => getRankInfo(s.xpLifetime).level >= 20},
+    {id:'rank30', icon:'wheel', title:'Rank 30', desc:'Reached Fleet Master.',
+      unlocked: s => getRankInfo(s.xpLifetime).level >= 30},
+    {id:'ladder-top', icon:'stairs', title:'Top of the Ladder', desc:'Reached the top step at least once.',
+      unlocked: s => s.ladderBest >= 7},
+    {id:'first-crate', icon:'crate', title:'First Crate', desc:'Opened your first crate.',
+      unlocked: s => Math.floor(s.xpLifetime / 500) >= 1},
+    {id:'cargo-hold', icon:'crate', title:'Cargo Hold', desc:'Opened 5 crates.',
+      unlocked: s => Math.floor(s.xpLifetime / 500) >= 5},
+    {id:'logkeeper', icon:'book', title:'Logkeeper', desc:'Saved your first reminder.',
+      unlocked: s => s.remindersSavedTotal >= 1},
+    {id:'master-logkeeper', icon:'book', title:'Master Logkeeper', desc:'Saved 15 reminders.',
+      unlocked: s => s.remindersSavedTotal >= 15},
+    {id:'bridge-visit', icon:'ring', title:'Bridge Visit', desc:"Used Ship's Bridge when you needed it.",
+      unlocked: s => !!s.sosEverOpened}
+  ];
+
+  function renderBadges(){
+    const wrap = el('badgeGrid');
+    if(!wrap) return;
+    wrap.innerHTML = '';
+    BADGES.forEach(b => {
+      const unlocked = b.unlocked(state);
+      const tile = document.createElement('div');
+      tile.className = 'badge-tile' + (unlocked ? '' : ' locked');
+      tile.innerHTML = `
+        <div class="badge-icon">${ICONS[b.icon]}</div>
+        <div class="badge-title">${b.title}</div>
+        <div class="badge-desc">${b.desc}</div>`;
+      wrap.appendChild(tile);
+    });
+  }
+
   function refreshXPStats(){
-    const level = Math.floor(state.xpLifetime / 100) + 1;
-    const intoLevel = state.xpLifetime % 100;
+    const info = getRankInfo(state.xpLifetime);
+    const intoLevel = info.intoLevel;
     const rewardProgress = state.xpLifetime % 500;
     const rewardsEarned = Math.floor(state.xpLifetime / 500);
 
-    el('xpLevelNum').textContent = 'RANK ' + level;
+    el('xpLevelNum').textContent = 'RANK ' + info.level + ' · ' + info.name;
     el('xpLevelSub').textContent = intoLevel + ' / 100 XP to next rank';
     renderMeter('levelBar', (intoLevel / 100) * 100);
 
@@ -2440,6 +2627,7 @@
     el('levelIconWrap').innerHTML = ICONS.medal;
     el('giftIconWrap').innerHTML = ICONS.crate;
     updateHeaderBadge();
+    renderBadges();
   }
 
   function renderXPGrid(){
@@ -2532,7 +2720,7 @@
   el('overlay').onclick = hideOverlay;
   el('ovClose').onclick = (e) => { e.stopPropagation(); hideOverlay(); };
 
-  const TITLES = {today:"J.J.'s Sailing Orders", say:'Say This', group:'Group Work', check:'Visibility Check', math:'Math Notes', remind:'Reminders', xp:'Engine Room', sos:"Ship's Bridge"};
+  const TITLES = {today:"J.J.'s Sailing Orders", talk:'Talk Tools', check:'Check-In', math:'Math Notes', remind:'Reminders', xp:'Trophy Hall', sos:"Ship's Bridge"};
   document.querySelectorAll('nav.tabbar button').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.remove('active'));
@@ -2541,17 +2729,29 @@
       const target = btn.dataset.screen;
       el('screen-' + target).classList.add('active');
       el('screenTitle').textContent = TITLES[target];
-      const badge = el('headerBadge');
-      if(target === 'today'){
-        badge.dataset.mode = 'ladder';
-      } else if(target === 'xp'){
-        badge.dataset.mode = 'xp';
-      } else {
-        badge.dataset.mode = '';
-      }
       updateHeaderBadge();
     };
   });
+
+  // Generic sub-tab switcher for merged screens (Talk Tools, Check-In).
+  // Looks inside `containerId` for .subtab-btn / .subtab-panel pairs matched
+  // by data-tab / data-tab-panel. Kept separate from the Math sub-tab wiring
+  // in initMathTools() so the two never interfere with each other.
+  function wireSubtabs(containerId){
+    const container = el(containerId);
+    if(!container) return;
+    const btns = Array.from(container.querySelectorAll('.subtab-btn'));
+    const panels = Array.from(container.querySelectorAll('.subtab-panel'));
+    btns.forEach(btn => {
+      btn.onclick = () => {
+        btns.forEach(b => b.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const target = container.querySelector('.subtab-panel[data-tab-panel="' + btn.dataset.tab + '"]');
+        if(target) target.classList.add('active');
+      };
+    });
+  }
 
   async function init(){
     renderNavIcons();
@@ -2578,6 +2778,10 @@
     state.xpWeek = weekly.v || 0;
     state.xpActionsToday = await loadJSON(todayKey('xp-actions'), {});
     state.reminders = await loadJSON('reminders', []);
+    const remindersTotal = await loadJSON('reminders-saved-total', {v:0});
+    state.remindersSavedTotal = remindersTotal.v || 0;
+    const sosEver = await loadJSON('sos-ever-opened', {v:false});
+    state.sosEverOpened = !!sosEver.v;
 
     const deckMood = await loadJSON(todayKey('deck-mood'), {v:'sunny'});
     state.deckMood = deckMood.v || 'sunny';
@@ -2606,14 +2810,14 @@
       await saveJSON('quiet-mode', {v: state.quietMode});
       updateHeaderBadge();
     };
-    el('headerBadge').dataset.mode = 'ladder';
-
     renderMissions();
     renderLadder();
     renderSay();
     renderGroupSteps();
     renderChecks();
     renderSOS();
+    wireSubtabs('screen-talk');
+    wireSubtabs('screen-check');
     renderXPGrid();
     refreshXPStats();
     updateHeaderBadge();
