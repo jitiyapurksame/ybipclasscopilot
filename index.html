@@ -92,6 +92,14 @@
   }
   .quiet-toggle svg{width:16px; height:16px; stroke:#fff; color:#fff;}
   .quiet-toggle.on{background:rgba(217,164,65,0.28); border-color:var(--amber);}
+  .exam-toggle.on{background:rgba(193,80,58,0.32); border-color:var(--rust);}
+  .exam-banner{
+    display:none; align-items:center; gap:10px; background:var(--rust-light);
+    border:1.5px solid rgba(193,80,58,0.4); border-radius:var(--radius);
+    padding:11px 13px; margin-bottom:14px; font-size:12.5px; color:var(--ink); line-height:1.4;
+  }
+  .exam-banner.show{display:flex;}
+  .exam-banner svg{width:20px; height:20px; flex-shrink:0;}
   
 
   .ship-hero{
@@ -109,6 +117,34 @@
   @keyframes waveDrift{ from{transform:translateX(0);} to{transform:translateX(-32px);} }
   .ship-hero.no-motion .wave-path{animation:none;}
   @media (prefers-reduced-motion: reduce){ .wave-path{animation:none;} }
+
+  /* --- Fun, quiet-mode-aware flourishes for the Today ship scene --- */
+  .ship-bob{transform-box:fill-box; transform-origin:50% 50%; animation:shipBob 4s ease-in-out infinite;}
+  @keyframes shipBob{0%,100%{transform:translateY(0);} 50%{transform:translateY(-2px);}}
+  .flag-wave{transform-box:fill-box; transform-origin:0% 50%; animation:flagWave 2.2s ease-in-out infinite;}
+  @keyframes flagWave{0%,100%{transform:skewX(0deg);} 50%{transform:skewX(14deg);}}
+  .smoke-puff{animation:smokeRise 3s ease-out infinite;}
+  @keyframes smokeRise{0%{transform:translateY(0) scale(0.6); opacity:0;} 25%{opacity:0.55;} 100%{transform:translateY(-16px) scale(1.3); opacity:0;}}
+  .cloud-drift{transform-box:fill-box; transform-origin:50% 50%; animation:cloudDrift 6s ease-in-out infinite;}
+  @keyframes cloudDrift{0%,100%{transform:translateX(0);} 50%{transform:translateX(6px);}}
+  .gull-glide{transform-box:fill-box; transform-origin:50% 50%; animation:cloudDrift 3.4s ease-in-out infinite;}
+  .rain-drop{animation:rainFall 1s linear infinite;}
+  @keyframes rainFall{0%{transform:translateY(0); opacity:0;} 25%{opacity:1;} 100%{transform:translateY(10px); opacity:0;}}
+  .twinkle-star{animation:twinkle 1.8s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:0.3;} 50%{opacity:1;}}
+  .weird-swirl{transform-box:fill-box; transform-origin:50% 50%; animation:swirlSpin 6s linear infinite;}
+  @keyframes swirlSpin{from{transform:rotate(0deg);} to{transform:rotate(360deg);}}
+  .ship-hero.no-motion .ship-bob,
+  .ship-hero.no-motion .flag-wave,
+  .ship-hero.no-motion .smoke-puff,
+  .ship-hero.no-motion .cloud-drift,
+  .ship-hero.no-motion .gull-glide,
+  .ship-hero.no-motion .rain-drop,
+  .ship-hero.no-motion .twinkle-star,
+  .ship-hero.no-motion .weird-swirl{animation:none;}
+  @media (prefers-reduced-motion: reduce){
+    .ship-bob, .flag-wave, .smoke-puff, .cloud-drift, .gull-glide, .rain-drop, .twinkle-star, .weird-swirl{animation:none;}
+  }
 
   .deck-check{margin-top:12px; padding-top:10px; border-top:1px dashed var(--line);}
   .deck-check-label{
@@ -703,6 +739,7 @@
     </div>
     <div class="header-right">
       <div class="badge" id="headerBadge">Level 0</div>
+      <button class="quiet-toggle exam-toggle" id="examToggle" title="Exam mode"></button>
       <button class="quiet-toggle" id="quietToggle" title="Quiet mode"></button>
     </div>
   </header>
@@ -712,7 +749,7 @@
     <section class="screen active" id="screen-today">
       <div class="ship-hero" id="shipHero">
         <div class="ship-scene" id="shipScene"></div>
-        <div class="ship-hero-caption">RMS J.J. &middot; Today's Manifest</div>
+        <div class="ship-hero-caption" id="shipCaption">RMS J.J. &middot; Today's Manifest</div>
         <div class="deck-check">
           <div class="deck-check-label">How's today feeling?</div>
           <div class="deck-pill-row" id="moodRow">
@@ -732,9 +769,13 @@
           </div>
         </div>
       </div>
+      <div class="exam-banner" id="examBanner">
+        <span id="examBannerIcon"></span>
+        <span>Exam Mode is on. No talking to classmates — raise your hand and wait for an invigilator.</span>
+      </div>
       <div class="card">
-        <h2>Today's small wins</h2>
-        <div class="sub">Tap when it happens. No pressure to do them all.</div>
+        <h2 id="missionsCardTitle">Today's small wins</h2>
+        <div class="sub" id="missionsCardSub">Tap when it happens. No pressure to do them all.</div>
         <div id="missionList"></div>
       </div>
       <div class="card" id="todayRemindCard">
@@ -751,7 +792,7 @@
         <div class="sub">Pick the kind of talking you need help with, tap a line to show it full screen.</div>
         <div class="subtab-row">
           <button class="subtab-btn active" data-tab="say">Say This</button>
-          <button class="subtab-btn" data-tab="group">Group Work</button>
+          <button class="subtab-btn" data-tab="group" id="talkGroupTabBtn">Group Work</button>
         </div>
 
         <div class="subtab-panel active" data-tab-panel="say">
@@ -1085,7 +1126,7 @@
 
 <script>
 (function(){
-  const APP_VERSION = '2026-09-08.4';
+  const APP_VERSION = '2026-09-26.2';
   const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
 
   // Clean stroke-line icon builder — blueprint style, matches the
@@ -1156,7 +1197,13 @@
     // Math tab — sextant / navigation tool
     sextant: ic('<path d="M4 20 12 4l8 16"/><path d="M8 12h8"/><circle cx="12" cy="4" r="1.4" fill="' + NAVY + '"/>', NAVY),
     // Reminders tab — ship's bell
-    bell: ic('<path d="M7 8a5 5 0 0 1 10 0c0 6 2.5 7.5 2.5 7.5h-15S7 14 7 8z"/><path d="M10.5 18.5a1.7 1.7 0 0 0 3 0"/>', AMBER)
+    bell: ic('<path d="M7 8a5 5 0 0 1 10 0c0 6 2.5 7.5 2.5 7.5h-15S7 14 7 8z"/><path d="M10.5 18.5a1.7 1.7 0 0 0 3 0"/>', AMBER),
+    // Exam Mode toggle / banner — captain's cap ("battle stations" feel)
+    examIcon: ic('<path d="M5 13a7 7 0 0 1 14 0"/><ellipse cx="12" cy="13.6" rx="10" ry="2.3"/><circle cx="12" cy="10" r="1.4" fill="' + CORAL + '"/>', CORAL),
+    // Exam Day Checklist — school uniform
+    uniform: ic('<path d="M8 4 4 7l2 3 2-1.5V20h8V8.5L18 10l2-3-4-3-2 2h-4z"/>', NAVY),
+    // Exam Day Checklist — phone off / silent
+    phone: ic('<rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/><line x1="3" y1="3" x2="21" y2="21"/>', SLATE)
   };
 
   const NAV_ICONS = {
@@ -1847,27 +1894,27 @@
   const DECK_SKY = {
     sunny: {
       bg: '#EAF6FF',
-      extra: '<circle cx="285" cy="20" r="9" fill="#D9A441"/><line x1="285" y1="4" x2="285" y2="9" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/><line x1="285" y1="31" x2="285" y2="36" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/><line x1="269" y1="20" x2="274" y2="20" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/><line x1="296" y1="20" x2="301" y2="20" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/>',
+      extra: '<circle cx="285" cy="20" r="9" fill="#D9A441"/><line x1="285" y1="4" x2="285" y2="9" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/><line x1="285" y1="31" x2="285" y2="36" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/><line x1="269" y1="20" x2="274" y2="20" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/><line x1="296" y1="20" x2="301" y2="20" stroke="#D9A441" stroke-width="2" stroke-linecap="round"/><path class="gull-glide" style="animation-delay:0s" d="M40 22 q4 -5 8 0 q4 -5 8 0" fill="none" stroke="#5B6B78" stroke-width="1.6" stroke-linecap="round"/><path class="gull-glide" style="animation-delay:.8s" d="M100 14 q3 -4 6 0 q3 -4 6 0" fill="none" stroke="#5B6B78" stroke-width="1.4" stroke-linecap="round"/>',
       wave: '#3F7191'
     },
     cloudy: {
       bg: '#DCE3E8',
-      extra: '<ellipse cx="270" cy="20" rx="16" ry="8" fill="#FFFFFF"/><ellipse cx="285" cy="16" rx="12" ry="7" fill="#FFFFFF"/><ellipse cx="55" cy="16" rx="14" ry="7" fill="#FFFFFF" opacity="0.85"/>',
+      extra: '<ellipse class="cloud-drift" style="animation-delay:0s" cx="270" cy="20" rx="16" ry="8" fill="#FFFFFF"/><ellipse class="cloud-drift" style="animation-delay:.5s" cx="285" cy="16" rx="12" ry="7" fill="#FFFFFF"/><ellipse class="cloud-drift" style="animation-delay:1s" cx="55" cy="16" rx="14" ry="7" fill="#FFFFFF" opacity="0.85"/>',
       wave: '#3F7191'
     },
     rainy: {
       bg: '#C7D2D9',
-      extra: '<ellipse cx="270" cy="18" rx="16" ry="8" fill="#B8C4CC"/><ellipse cx="285" cy="14" rx="12" ry="7" fill="#B8C4CC"/><ellipse cx="55" cy="16" rx="14" ry="7" fill="#B8C4CC" opacity="0.85"/><line x1="262" y1="30" x2="258" y2="39" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line x1="275" y1="30" x2="271" y2="41" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line x1="288" y1="28" x2="284" y2="38" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line x1="47" y1="27" x2="43" y2="37" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line x1="60" y1="27" x2="56" y2="38" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/>',
+      extra: '<ellipse cx="270" cy="18" rx="16" ry="8" fill="#B8C4CC"/><ellipse cx="285" cy="14" rx="12" ry="7" fill="#B8C4CC"/><ellipse cx="55" cy="16" rx="14" ry="7" fill="#B8C4CC" opacity="0.85"/><line class="rain-drop" style="animation-delay:0s" x1="262" y1="30" x2="258" y2="39" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line class="rain-drop" style="animation-delay:.2s" x1="275" y1="30" x2="271" y2="41" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line class="rain-drop" style="animation-delay:.4s" x1="288" y1="28" x2="284" y2="38" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line class="rain-drop" style="animation-delay:.15s" x1="47" y1="27" x2="43" y2="37" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/><line class="rain-drop" style="animation-delay:.35s" x1="60" y1="27" x2="56" y2="38" stroke="#5B8AA6" stroke-width="2" stroke-linecap="round"/>',
       wave: '#2C5870'
     },
     stormy: {
       bg: '#16324A',
-      extra: '<circle cx="270" cy="18" r="7" fill="#F1ECDD" opacity="0.85"/><circle cx="30" cy="14" r="1.6" fill="#F1ECDD"/><circle cx="45" cy="22" r="1.2" fill="#F1ECDD"/><circle cx="230" cy="12" r="1.4" fill="#F1ECDD"/>',
+      extra: '<circle cx="270" cy="18" r="7" fill="#F1ECDD" opacity="0.85"/><circle class="twinkle-star" style="animation-delay:0s" cx="30" cy="14" r="1.6" fill="#F1ECDD"/><circle class="twinkle-star" style="animation-delay:.5s" cx="45" cy="22" r="1.2" fill="#F1ECDD"/><circle class="twinkle-star" style="animation-delay:1s" cx="230" cy="12" r="1.4" fill="#F1ECDD"/>',
       wave: '#2C5870'
     },
     weird: {
       bg: '#E8DFF5',
-      extra: '<circle cx="60" cy="18" r="22" fill="#D9F0E8" opacity="0.7"/><path d="M280 8 q9 0 9 9 q0 7 -7 7 q-5 0 -5 -5 q0 -3 3 -3" stroke="#8B6DB8" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M232 12 l3 3 M235 12 l-3 3" stroke="#D9A441" stroke-width="1.8" stroke-linecap="round"/><path d="M18 30 l3 3 M21 30 l-3 3" stroke="#8B6DB8" stroke-width="1.8" stroke-linecap="round"/>',
+      extra: '<circle cx="60" cy="18" r="22" fill="#D9F0E8" opacity="0.7"/><path class="weird-swirl" d="M280 8 q9 0 9 9 q0 7 -7 7 q-5 0 -5 -5 q0 -3 3 -3" stroke="#8B6DB8" stroke-width="2" fill="none" stroke-linecap="round"/><path class="twinkle-star" style="animation-delay:0s" d="M232 12 l3 3 M235 12 l-3 3" stroke="#D9A441" stroke-width="1.8" stroke-linecap="round"/><path class="twinkle-star" style="animation-delay:.7s" d="M18 30 l3 3 M21 30 l-3 3" stroke="#8B6DB8" stroke-width="1.8" stroke-linecap="round"/>',
       wave: '#8B6DB8'
     }
   };
@@ -1888,21 +1935,27 @@
       ${sky.extra}
       <path class="wave-path" d="M10 122 q8 -6 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0" fill="none" stroke="${waveColor}" stroke-width="2" stroke-linecap="round"/>
       <line x1="15" y1="112" x2="305" y2="112" stroke="#0E2A45" stroke-width="1.2" stroke-dasharray="5 5" opacity="0.5"/>
-      <path d="M30 95 L52 60 L268 60 L290 95 Q290 109 273 109 L47 109 Q30 109 30 95 Z" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2.5" stroke-linejoin="round"/>
-      ${portholes}
-      <rect x="108" y="34" width="104" height="27" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
-      <rect x="120" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
-      <rect x="134" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
-      <rect x="148" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
-      <rect x="162" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
-      <rect x="176" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
-      <rect x="190" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
-      <rect x="150" y="8" width="16" height="29" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
-      <rect x="150" y="8" width="16" height="8" fill="#D9A441"/>
-      <rect x="178" y="8" width="16" height="29" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
-      <rect x="178" y="8" width="16" height="8" fill="#D9A441"/>
-      <line x1="56" y1="60" x2="56" y2="30" stroke="#0E2A45" stroke-width="2"/>
-      <path d="M56 30 L74 36 L56 42 Z" fill="#C1503A"/>
+      <g class="ship-bob">
+        <path d="M30 95 L52 60 L268 60 L290 95 Q290 109 273 109 L47 109 Q30 109 30 95 Z" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2.5" stroke-linejoin="round"/>
+        ${portholes}
+        <rect x="108" y="34" width="104" height="27" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
+        <rect x="120" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+        <rect x="134" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+        <rect x="148" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+        <rect x="162" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+        <rect x="176" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+        <rect x="190" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
+        <rect x="150" y="8" width="16" height="29" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
+        <rect x="150" y="8" width="16" height="8" fill="#D9A441"/>
+        <rect x="178" y="8" width="16" height="29" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
+        <rect x="178" y="8" width="16" height="8" fill="#D9A441"/>
+        <circle class="smoke-puff" style="animation-delay:0s" cx="158" cy="6" r="3" fill="#C7D2D9"/>
+        <circle class="smoke-puff" style="animation-delay:1s" cx="158" cy="6" r="3" fill="#C7D2D9"/>
+        <circle class="smoke-puff" style="animation-delay:1.5s" cx="186" cy="6" r="3" fill="#C7D2D9"/>
+        <circle class="smoke-puff" style="animation-delay:.5s" cx="186" cy="6" r="3" fill="#C7D2D9"/>
+        <line x1="56" y1="60" x2="56" y2="30" stroke="#0E2A45" stroke-width="2"/>
+        <path class="flag-wave" d="M56 30 L74 36 L56 42 Z" fill="#C1503A"/>
+      </g>
     </svg>`;
   }
 
@@ -1978,10 +2031,21 @@
     'Fleet Commander','Rear Admiral','Vice Admiral','Admiral','Grand Admiral',
     'Fleet Admiral','Master Navigator','Voyage Legend','Ocean Pioneer','Fleet Master'
   ];
+  // Two full passes through RANK_NAMES (base, then "Grand"-prefixed) gives 60
+  // named tiers — 6,000 XP of runway — before falling back to endless
+  // "Legend N". Extended 2026-09-26 because the original 30-tier list
+  // (3,000 XP) was about to run out right as he reached it.
   function getRankInfo(xpLifetime){
     const level = Math.floor(xpLifetime / 100) + 1;
-    const idx = level - 1;
-    const name = idx < RANK_NAMES.length ? RANK_NAMES[idx] : ('Legend ' + (level - RANK_NAMES.length + 1));
+    const tierSize = RANK_NAMES.length;
+    let name;
+    if(level <= tierSize){
+      name = RANK_NAMES[level - 1];
+    } else if(level <= tierSize * 2){
+      name = 'Grand ' + RANK_NAMES[level - tierSize - 1];
+    } else {
+      name = 'Legend ' + (level - tierSize * 2);
+    }
     const intoLevel = xpLifetime % 100;
     return {level, name, intoLevel};
   }
@@ -2015,6 +2079,18 @@
     {id:'ladder', text:'Try one new level on the ladder (Check-In tab)', xp:5, icon:'stairs'}
   ];
 
+  // Exam Day Checklist — shown instead of MISSIONS when Exam Mode is on.
+  // Drawn directly from the teacher's midterm exam rules. Same mechanic as
+  // MISSIONS (once per item per day, +5 XP, no undo) but its own storage
+  // keys ('exam-missions'), so switching modes never touches normal-day data.
+  const EXAM_MISSIONS = [
+    {id:'uniform', text:'Full school uniform — no PE kit', xp:5, icon:'uniform'},
+    {id:'early', text:'Outside the exam room 10 minutes early', xp:5, icon:'clock'},
+    {id:'phone', text:'Phone off or silent, in the drawer', xp:5, icon:'phone'},
+    {id:'stationery', text:'Only allowed stationery — clear pencil case', xp:5, icon:'marker'},
+    {id:'quiet', text:"No talking — raise your hand for an invigilator", xp:5, icon:'flag'}
+  ];
+
   const LADDER = [
     {n:1, label:'Look', desc:"Look at whoever is talking.", xp:3, icon:'eye'},
     {n:2, label:'Nod', desc:"Nod when you understand or agree.", xp:3, icon:'agree'},
@@ -2031,6 +2107,16 @@
     moment: ["I'm not sure.", "Can you repeat that?", "Can you explain that again?"]
   };
   const SAY_GROUP_ICONS = {start:'idea', respond:'agree', moment:'pause'};
+  const SAY_GROUP_LABELS = {start:'Start talking', respond:'Respond to someone', moment:'Need a moment'};
+
+  // Exam Mode versions — no talking to classmates during an exam, only
+  // raising your hand for an invigilator, so the phrasing and headings change.
+  const EXAM_SAY_GROUPS = {
+    start: ["I have a question.", "I need more paper.", "I need the toilet."],
+    respond: ["Yes, I'm ready.", "I'm still working."],
+    moment: ["Can you repeat the instructions?", "I need a moment."]
+  };
+  const EXAM_SAY_GROUP_LABELS = {start:'Raise your hand and say', respond:'When the invigilator asks', moment:'While you wait'};
 
   const GROUP_STEPS = [
     {en:"Starting", line:"What should I do?"},
@@ -2158,7 +2244,10 @@
     moodXPGiven: false,
     energyXPGiven: false,
     remindersSavedTotal: 0,
-    sosEverOpened: false
+    sosEverOpened: false,
+    examMode: false,
+    examMissions: {},
+    examMissionsXPGiven: {}
   };
 
   const el = id => document.getElementById(id);
@@ -2168,22 +2257,33 @@
     return d.toLocaleDateString('en-US', {weekday:'long', month:'short', day:'numeric'});
   }
 
+  // Exam Mode swaps which list/storage renderMissions uses, without ever
+  // mixing normal-day and exam-day data together.
+  function activeMissionSet(){ return state.examMode ? EXAM_MISSIONS : MISSIONS; }
+  function activeMissionsDone(){ return state.examMode ? state.examMissions : state.missions; }
+  function activeMissionsGiven(){ return state.examMode ? state.examMissionsXPGiven : state.missionsXPGiven; }
+  function activeMissionsDoneKey(){ return state.examMode ? todayKey('exam-missions') : todayKey('missions'); }
+  function activeMissionsGivenKey(){ return state.examMode ? todayKey('exam-missions-xp') : todayKey('missions-xp'); }
+
   function renderMissions(){
     const wrap = el('missionList');
     wrap.innerHTML = '';
-    MISSIONS.forEach(m => {
-      const done = !!state.missions[m.id];
+    const list = activeMissionSet();
+    const doneMap = activeMissionsDone();
+    const givenMap = activeMissionsGiven();
+    list.forEach(m => {
+      const done = !!doneMap[m.id];
       const row = document.createElement('div');
       row.className = 'mission-row';
       row.innerHTML = `<div class="row-icon">${ICONS[m.icon]}</div><div class="mission-check ${done?'done':''}">${CHECK_SVG}</div><div class="mission-text ${done?'done':''}">${m.text}</div>`;
       row.onclick = async () => {
-        const nowDone = !state.missions[m.id];
-        state.missions[m.id] = nowDone;
-        await saveJSON(todayKey('missions'), state.missions);
+        const nowDone = !doneMap[m.id];
+        doneMap[m.id] = nowDone;
+        await saveJSON(activeMissionsDoneKey(), doneMap);
         renderMissions();
-        if(nowDone && !state.missionsXPGiven[m.id]){
-          state.missionsXPGiven[m.id] = true;
-          await saveJSON(todayKey('missions-xp'), state.missionsXPGiven);
+        if(nowDone && !givenMap[m.id]){
+          givenMap[m.id] = true;
+          await saveJSON(activeMissionsGivenKey(), givenMap);
           await adjustXP(m.xp);
           popFloatXP(row, m.xp);
         }
@@ -2246,12 +2346,14 @@
   }
 
   function renderSay(){
+    const groups = state.examMode ? EXAM_SAY_GROUPS : SAY_GROUPS;
+    const labels = state.examMode ? EXAM_SAY_GROUP_LABELS : SAY_GROUP_LABELS;
     ['start','respond','moment'].forEach(g => {
       const titleEl = el('grpTitle-' + g);
-      titleEl.innerHTML = ICONS[SAY_GROUP_ICONS[g]] + '<span>' + titleEl.textContent + '</span>';
+      titleEl.innerHTML = ICONS[SAY_GROUP_ICONS[g]] + '<span>' + labels[g] + '</span>';
       const wrap = el('grp-' + g);
       wrap.innerHTML = '';
-      SAY_GROUPS[g].forEach(t => wrap.appendChild(composeChip(t, 'sayCompose')));
+      groups[g].forEach(t => wrap.appendChild(composeChip(t, 'sayCompose')));
     });
     el('sayShowBtn').onclick = () => {
       const text = el('sayCompose').value.trim();
@@ -2577,6 +2679,12 @@
       unlocked: s => getRankInfo(s.xpLifetime).level >= 20},
     {id:'rank30', icon:'wheel', title:'Rank 30', desc:'Reached Fleet Master.',
       unlocked: s => getRankInfo(s.xpLifetime).level >= 30},
+    {id:'rank40', icon:'medal', title:'Rank 40', desc:'Reached Grand Senior Navigator.',
+      unlocked: s => getRankInfo(s.xpLifetime).level >= 40},
+    {id:'rank50', icon:'star', title:'Rank 50', desc:'Reached Grand Commodore.',
+      unlocked: s => getRankInfo(s.xpLifetime).level >= 50},
+    {id:'rank60', icon:'wheel', title:'Rank 60', desc:'Reached Grand Fleet Master.',
+      unlocked: s => getRankInfo(s.xpLifetime).level >= 60},
     {id:'ladder-top', icon:'stairs', title:'Top of the Ladder', desc:'Reached the top step at least once.',
       unlocked: s => s.ladderBest >= 7},
     {id:'first-crate', icon:'crate', title:'First Crate', desc:'Opened your first crate.',
@@ -2753,6 +2861,33 @@
     });
   }
 
+  // Switches the Today checklist, Say This wording, and Group Work visibility
+  // between normal and exam-day content. Called on load and whenever the
+  // Exam Mode toggle is tapped. Nothing here touches XP math or storage
+  // beyond what renderMissions/renderSay already handle per mode.
+  function applyExamMode(){
+    const capt = el('shipCaption');
+    if(capt) capt.textContent = state.examMode ? "RMS J.J. \u00b7 Exam Day Manifest" : "RMS J.J. \u00b7 Today's Manifest";
+    const title = el('missionsCardTitle');
+    if(title) title.textContent = state.examMode ? 'Exam Day Checklist' : "Today's small wins";
+    const sub = el('missionsCardSub');
+    if(sub) sub.textContent = state.examMode ? 'Tap each one as you get it done before the exam starts.' : 'Tap when it happens. No pressure to do them all.';
+    const banner = el('examBanner');
+    if(banner) banner.classList.toggle('show', state.examMode);
+
+    const groupBtn = el('talkGroupTabBtn');
+    if(groupBtn){
+      groupBtn.style.display = state.examMode ? 'none' : '';
+      if(state.examMode && groupBtn.classList.contains('active')){
+        const sayBtn = document.querySelector('#screen-talk .subtab-btn[data-tab="say"]');
+        if(sayBtn) sayBtn.click();
+      }
+    }
+
+    renderMissions();
+    renderSay();
+  }
+
   async function init(){
     renderNavIcons();
     initMathTools();
@@ -2761,6 +2896,8 @@
     if(vs) vs.textContent = 'v' + APP_VERSION;
     state.missions = await loadJSON(todayKey('missions'), {});
     state.missionsXPGiven = await loadJSON(todayKey('missions-xp'), {});
+    state.examMissions = await loadJSON(todayKey('exam-missions'), {});
+    state.examMissionsXPGiven = await loadJSON(todayKey('exam-missions-xp'), {});
     const ladderToday = await loadJSON(todayKey('ladder'), {v:0});
     state.ladderToday = ladderToday.v || 0;
     const best = await loadJSON('ladder-best', {v:0});
@@ -2810,6 +2947,21 @@
       await saveJSON('quiet-mode', {v: state.quietMode});
       updateHeaderBadge();
     };
+
+    const examSaved = await loadJSON('exam-mode', {v:false});
+    state.examMode = !!examSaved.v;
+    const examBtn = el('examToggle');
+    examBtn.innerHTML = ICONS.examIcon;
+    examBtn.classList.toggle('on', state.examMode);
+    el('examBannerIcon').innerHTML = ICONS.examIcon;
+    examBtn.onclick = async () => {
+      state.examMode = !state.examMode;
+      examBtn.classList.toggle('on', state.examMode);
+      await saveJSON('exam-mode', {v: state.examMode});
+      applyExamMode();
+    };
+    applyExamMode();
+
     renderMissions();
     renderLadder();
     renderSay();
