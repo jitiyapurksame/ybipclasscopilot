@@ -1126,7 +1126,7 @@
 
 <script>
 (function(){
-  const APP_VERSION = '2026-09-26.2';
+  const APP_VERSION = '2026-09-26.3';
   const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
 
   // Clean stroke-line icon builder — blueprint style, matches the
@@ -1919,16 +1919,26 @@
     }
   };
 
-  function shipSceneSVG(mood, energy){
+  function shipSceneSVG(mood, energy, examMode){
     const sky = DECK_SKY[mood] || DECK_SKY.sunny;
     const waveColor = sky.wave;
+
+    // Exam Mode gives the ship a "battle stations" look: alert-red portholes
+    // instead of cheerful gold, grey trim instead of gold, and a cannon on
+    // the mast instead of the flag.
+    const litColor = examMode ? '#C1503A' : '#D9A441';
+    const trimColor = examMode ? '#5B6B78' : '#D9A441';
 
     const litCount = {empty:0, low:2, med:4, high:6, full:8}[energy] ?? 0;
     const portholeXs = [75, 100, 125, 150, 175, 200, 225, 250];
     const portholes = portholeXs.map((x, i) => {
       const lit = i < litCount;
-      return `<circle cx="${x}" cy="82" r="4.5" fill="${lit ? '#D9A441' : 'none'}" stroke="#D9A441" stroke-width="1.6"${lit ? ' opacity="0.95"' : ''}/>`;
+      return `<circle cx="${x}" cy="82" r="4.5" fill="${lit ? litColor : 'none'}" stroke="${litColor}" stroke-width="1.6"${lit ? ' opacity="0.95"' : ''}/>`;
     }).join('');
+
+    const mastTop = examMode
+      ? `<circle cx="56" cy="31" r="3.5" fill="#0E2A45"/><rect x="54" y="25" width="23" height="7" rx="3" fill="#5B6B78" stroke="#0E2A45" stroke-width="1.5"/><circle cx="77" cy="28.5" r="3.6" fill="#3E4A54" stroke="#0E2A45" stroke-width="1.5"/>`
+      : `<path class="flag-wave" d="M56 30 L74 36 L56 42 Z" fill="#C1503A"/>`;
 
     return `<svg viewBox="0 0 320 130">
       <rect x="0" y="0" width="320" height="130" fill="${sky.bg}"/>
@@ -1946,15 +1956,15 @@
         <rect x="176" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
         <rect x="190" y="42" width="8" height="9" fill="#0E2A45" opacity="0.85"/>
         <rect x="150" y="8" width="16" height="29" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
-        <rect x="150" y="8" width="16" height="8" fill="#D9A441"/>
+        <rect x="150" y="8" width="16" height="8" fill="${trimColor}"/>
         <rect x="178" y="8" width="16" height="29" rx="3" fill="#FFFFFF" stroke="#0E2A45" stroke-width="2"/>
-        <rect x="178" y="8" width="16" height="8" fill="#D9A441"/>
+        <rect x="178" y="8" width="16" height="8" fill="${trimColor}"/>
         <circle class="smoke-puff" style="animation-delay:0s" cx="158" cy="6" r="3" fill="#C7D2D9"/>
         <circle class="smoke-puff" style="animation-delay:1s" cx="158" cy="6" r="3" fill="#C7D2D9"/>
         <circle class="smoke-puff" style="animation-delay:1.5s" cx="186" cy="6" r="3" fill="#C7D2D9"/>
         <circle class="smoke-puff" style="animation-delay:.5s" cx="186" cy="6" r="3" fill="#C7D2D9"/>
         <line x1="56" y1="60" x2="56" y2="30" stroke="#0E2A45" stroke-width="2"/>
-        <path class="flag-wave" d="M56 30 L74 36 L56 42 Z" fill="#C1503A"/>
+        ${mastTop}
       </g>
     </svg>`;
   }
@@ -1962,7 +1972,7 @@
   function renderShipScene(){
     const wrap = el('shipScene');
     if(!wrap) return;
-    wrap.innerHTML = shipSceneSVG(state.deckMood, state.deckEnergy);
+    wrap.innerHTML = shipSceneSVG(state.deckMood, state.deckEnergy, state.examMode);
   }
 
   function updateDeckPills(){
@@ -2886,6 +2896,7 @@
 
     renderMissions();
     renderSay();
+    renderShipScene();
   }
 
   async function init(){
