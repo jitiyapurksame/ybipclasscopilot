@@ -824,10 +824,10 @@
     <section class="screen" id="screen-check">
       <div class="card">
         <h2>Check-In</h2>
-        <div class="sub">Two quick ways to check how today's going.</div>
+        <div class="sub" id="checkCardSub">Two quick ways to check how today's going.</div>
         <div class="subtab-row">
-          <button class="subtab-btn active" data-tab="ladder">The Ladder</button>
-          <button class="subtab-btn" data-tab="visibility">Visibility</button>
+          <button class="subtab-btn active" data-tab="ladder" id="checkLadderTabBtn">The Ladder</button>
+          <button class="subtab-btn" data-tab="visibility" id="checkVisibilityTabBtn">Visibility</button>
         </div>
 
         <div class="subtab-panel active" data-tab-panel="ladder">
@@ -836,7 +836,7 @@
         </div>
 
         <div class="subtab-panel" data-tab-panel="visibility">
-          <div class="sub">Five ways to be seen today. Tick when done.</div>
+          <div class="sub" id="checkVisibilitySub">Five ways to be seen today. Tick when done.</div>
           <div id="checkList"></div>
         </div>
       </div>
@@ -1126,7 +1126,7 @@
 
 <script>
 (function(){
-  const APP_VERSION = '2026-09-26.3';
+  const APP_VERSION = '2026-09-26.4';
   const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
 
   // Clean stroke-line icon builder — blueprint style, matches the
@@ -2143,6 +2143,20 @@
     {id:'look', en:'Look at teacher while explaining', xp:10, icon:'eye'}
   ];
 
+  // Exam Habits — shown instead of CHECK_ITEMS on the Visibility subtab when
+  // Exam Mode is on. "Help a friend" and "Ask 1 question" don't apply (no
+  // talking to classmates in an exam), so these are quiet, personal exam
+  // habits instead. Same mechanic (+10 XP, once per item per day) but its
+  // own storage keys ('exam-checks') so switching modes never touches
+  // normal-day Visibility progress.
+  const EXAM_CHECK_ITEMS = [
+    {id:'hand', en:'Raise your hand if you need help', xp:10, icon:'flag'},
+    {id:'readtwice', en:'Read each question twice', xp:10, icon:'eye'},
+    {id:'skip', en:"Skip a hard one, come back later", xp:10, icon:'marker'},
+    {id:'recheck', en:"Check your answers if there's time left", xp:10, icon:'finish'},
+    {id:'seated', en:'Stay seated until 30 minutes are up', xp:10, icon:'clock'}
+  ];
+
   const SOS_PHRASES = [
     "I don't understand.",
     "Can you explain?",
@@ -2257,7 +2271,9 @@
     sosEverOpened: false,
     examMode: false,
     examMissions: {},
-    examMissionsXPGiven: {}
+    examMissionsXPGiven: {},
+    examChecks: {},
+    examChecksXPGiven: {}
   };
 
   const el = id => document.getElementById(id);
@@ -2400,22 +2416,34 @@
     };
   }
 
+  // Exam Mode swaps which list/storage renderChecks uses, without ever
+  // mixing normal-day and exam-day data together — same pattern as the
+  // active-mission helpers above.
+  function activeCheckItems(){ return state.examMode ? EXAM_CHECK_ITEMS : CHECK_ITEMS; }
+  function activeChecksDone(){ return state.examMode ? state.examChecks : state.checks; }
+  function activeChecksGiven(){ return state.examMode ? state.examChecksXPGiven : state.checksXPGiven; }
+  function activeChecksDoneKey(){ return state.examMode ? todayKey('exam-checks') : todayKey('checks'); }
+  function activeChecksGivenKey(){ return state.examMode ? todayKey('exam-checks-xp') : todayKey('checks-xp'); }
+
   function renderChecks(){
     const wrap = el('checkList');
     wrap.innerHTML = '';
-    CHECK_ITEMS.forEach(c => {
-      const done = !!state.checks[c.id];
+    const list = activeCheckItems();
+    const doneMap = activeChecksDone();
+    const givenMap = activeChecksGiven();
+    list.forEach(c => {
+      const done = !!doneMap[c.id];
       const row = document.createElement('div');
       row.className = 'check-row';
       row.innerHTML = `<div class="row-icon">${ICONS[c.icon]}</div><div class="check-box ${done?'done':''}">${CHECK_SVG}</div><div class="check-th">${c.en}</div>`;
       row.onclick = async () => {
-        const nowDone = !state.checks[c.id];
-        state.checks[c.id] = nowDone;
-        await saveJSON(todayKey('checks'), state.checks);
+        const nowDone = !doneMap[c.id];
+        doneMap[c.id] = nowDone;
+        await saveJSON(activeChecksDoneKey(), doneMap);
         renderChecks();
-        if(nowDone && !state.checksXPGiven[c.id]){
-          state.checksXPGiven[c.id] = true;
-          await saveJSON(todayKey('checks-xp'), state.checksXPGiven);
+        if(nowDone && !givenMap[c.id]){
+          givenMap[c.id] = true;
+          await saveJSON(activeChecksGivenKey(), givenMap);
           await adjustXP(c.xp);
           popFloatXP(row, c.xp);
         }
@@ -2894,8 +2922,26 @@
       }
     }
 
+    // The Ladder is about classroom talking/participation depth, which
+    // doesn't apply in a silent exam — hide it and relabel Visibility as
+    // Exam Habits with exam-appropriate content instead.
+    const ladderBtn = el('checkLadderTabBtn');
+    const visBtn = el('checkVisibilityTabBtn');
+    const checkCardSub = el('checkCardSub');
+    const visSub = el('checkVisibilitySub');
+    if(ladderBtn){
+      ladderBtn.style.display = state.examMode ? 'none' : '';
+      if(state.examMode && ladderBtn.classList.contains('active') && visBtn){
+        visBtn.click();
+      }
+    }
+    if(visBtn) visBtn.textContent = state.examMode ? 'Exam Habits' : 'Visibility';
+    if(checkCardSub) checkCardSub.textContent = state.examMode ? "One quick way to check how the exam's going." : "Two quick ways to check how today's going.";
+    if(visSub) visSub.textContent = state.examMode ? 'Five habits worth trying during the exam. Tick when done.' : 'Five ways to be seen today. Tick when done.';
+
     renderMissions();
     renderSay();
+    renderChecks();
     renderShipScene();
   }
 
@@ -2917,6 +2963,8 @@
     state.ladderXPWatermark = watermark.v || 0;
     state.checks = await loadJSON(todayKey('checks'), {});
     state.checksXPGiven = await loadJSON(todayKey('checks-xp'), {});
+    state.examChecks = await loadJSON(todayKey('exam-checks'), {});
+    state.examChecksXPGiven = await loadJSON(todayKey('exam-checks-xp'), {});
 
     const lifetime = await loadJSON('xp-lifetime', {v:0});
     state.xpLifetime = lifetime.v || 0;
@@ -2944,6 +2992,15 @@
     renderShipScene();
     updateDeckPills();
     wireDeckControls();
+
+    renderMissions();
+    renderLadder();
+    renderSay();
+    renderGroupSteps();
+    renderChecks();
+    renderSOS();
+    wireSubtabs('screen-talk');
+    wireSubtabs('screen-check');
 
     const quiet = await loadJSON('quiet-mode', {v:false});
     state.quietMode = !!quiet.v;
@@ -2973,14 +3030,6 @@
     };
     applyExamMode();
 
-    renderMissions();
-    renderLadder();
-    renderSay();
-    renderGroupSteps();
-    renderChecks();
-    renderSOS();
-    wireSubtabs('screen-talk');
-    wireSubtabs('screen-check');
     renderXPGrid();
     refreshXPStats();
     updateHeaderBadge();
