@@ -420,6 +420,27 @@
   .hto-result .hto-cell{color:var(--ink);}
   .hto-highlight{color:var(--rust) !important;}
 
+  /* --- Calculator guide (Math > Calc) --- */
+  .calc-rule{background:#fff; border:2px dashed var(--amber); border-radius:var(--radius); padding:14px; margin-bottom:12px;}
+  .calc-rule h2{margin:0 0 8px; font-size:15px;}
+  .calc-rule ol{margin:0; padding-left:0; list-style:none; counter-reset:cr;}
+  .calc-rule li{counter-increment:cr; display:flex; gap:10px; align-items:flex-start; font-size:14px; font-weight:600; padding:6px 0;}
+  .calc-rule li::before{content:counter(cr); flex-shrink:0; width:24px; height:24px; border-radius:7px; background:var(--moss); color:#fff; font-family:var(--mono); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center;}
+  .calc-legend{font-size:11.5px; color:var(--ink-soft); margin:0 2px 10px; display:flex; flex-wrap:wrap; gap:6px; align-items:center;}
+  .k{display:inline-flex; align-items:center; justify-content:center; min-width:32px; height:32px; padding:0 8px; border-radius:8px; background:var(--moss); color:#fff; font-family:var(--mono); font-weight:700; font-size:13px; box-shadow:0 2px 0 rgba(0,0,0,0.3); margin:0 2px 4px 0;}
+  .k-shift{background:var(--amber); color:var(--teal-dark);}
+  .k-alpha{background:var(--rust); color:#fff;}
+  .calc-step{margin-bottom:10px;}
+  .calc-step-label{font-size:12px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px;}
+  .calc-step-label b{color:var(--moss); font-family:var(--mono);}
+  .calc-ex{font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+  .write-box{background:#FFFDF4; border:1.5px solid var(--amber); border-radius:12px; padding:10px 12px; margin-top:12px;}
+  .write-box .wb-title{display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--rust); margin-bottom:6px;}
+  .write-box .wb-title svg{width:15px; height:15px;}
+  .write-box .wb-line{font-family:var(--mono); font-size:13.5px; padding:4px 0; border-bottom:1px solid rgba(217,164,65,0.35); line-height:1.4;}
+  .write-box .wb-line:last-child{border-bottom:none;}
+  .calc-tip{font-size:12.5px; margin-top:10px; padding:9px 11px; border-radius:10px; background:var(--moss-light); line-height:1.45;}
+
   /* --- Reminders --- */
   .remind-type-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
   .remind-type-chip{
@@ -894,6 +915,7 @@
         <button class="math-subtab" data-math="angle">Angle</button>
         <button class="math-subtab" data-math="shape">Shape</button>
         <button class="math-subtab" data-math="hto">HTO</button>
+        <button class="math-subtab" data-math="calc">🧮 Calc</button>
       </div>
 
       <!-- Cross Out -->
@@ -1004,6 +1026,9 @@
           <div id="htoSummary" class="math-summary"></div>
         </div>
       </div>
+      <!-- CALC GUIDE -->
+      <div class="math-panel" id="math-calc"><div id="calcGuide"></div></div>
+    
     </section>
 
     <!-- REMIND -->
@@ -1126,7 +1151,7 @@
 
 <script>
 (function(){
-  const APP_VERSION = '2026-09-26.4';
+  const APP_VERSION = '2026-10-11.8';
   const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
 
   // Clean stroke-line icon builder — blueprint style, matches the
@@ -1683,6 +1708,234 @@
     el('htoBuildBtn').onclick = computeHTO;
     updateHtoInputsForOp();
     computeHTO();
+  }
+
+  /* ===== CALCULATOR GUIDE (Casio fx-991ES PLUS 2nd edition) ===== */
+  const CALC_MACROS = {X:['ALPHA',')'], EQ:['ALPHA','CALC'], SOLVE:['SHIFT','CALC']};
+  const CALC_LABELS = {FRAC:'\u25AB/\u25AB', SQRT:'\u221A\u25AB', POW:'x\u25AB'};
+  const CALC_RECIPES = [
+    {t:'Speed, distance, time (physics)', ex:'120 km in 1.5 h. Then: how long for 200 km?',
+     steps:[['Speed = distance \u00F7 time',['1','2','0','\u00F7','1','.','5','=']],['Time = distance \u00F7 speed',['2','0','0','\u00F7','8','0','=']]],
+     write:['speed = distance \u00F7 time','= 120 km \u00F7 1.5 h = 80 km/h','time = distance \u00F7 speed','= 200 km \u00F7 80 km/h = 2.5 h'],
+     tip:'Minutes to hours? Divide by 60 first. 30 min = 30 \u00F7 60 = 0.5 h.'},
+    {t:'Distance-time graph: find the speed', ex:'line from (0 s, 0 m) to (8 s, 40 m)',
+     steps:[['Speed = how far up \u00F7 how far across',['4','0','\u00F7','8','=']]],
+     write:['speed = change in distance \u00F7 change in time','= 40 m \u00F7 8 s','= 5 m/s'],
+     tip:'Pick two points far apart on the line. A flat line means not moving.'},
+    {t:'Turning forces (moments)', ex:'20 N at 0.5 m from the pivot',
+     steps:[['Force \u00D7 distance',['2','0','\u00D7','0','.','5','=']]],
+     write:['moment = force \u00D7 distance','= 20 N \u00D7 0.5 m','= 10 N m'],
+     tip:'Balanced? The clockwise moment equals the anticlockwise moment. Work out both sides and compare.'},
+    {t:'Pressure', ex:'600 N on 0.03 m\u00B2',
+     steps:[['Force \u00F7 area',['6','0','0','\u00F7','0','.','0','3','=']]],
+     write:['pressure = force \u00F7 area','= 600 N \u00F7 0.03 m\u00B2','= 20 000 N/m\u00B2'],
+     tip:'Area in cm\u00B2? Divide by 10 000 to get m\u00B2. Same force on a smaller area gives more pressure.'},
+    {t:'Circuits: add the voltages', ex:'3 cells of 1.5 V in series',
+     steps:[['Add them (or \u00D7)',['3','\u00D7','1','.','5','=']]],
+     write:['series: voltages add','1.5 + 1.5 + 1.5 = 4.5 V'],
+     tip:'Series: the same current everywhere. Parallel: the branch currents add up to the total.'},
+    {t:'Light: angle of incidence', ex:'ray hits a mirror 30\u00B0 from the mirror surface',
+     steps:[['The angle is measured from the normal. Take it from 90',['9','0','\u2212','3','0','=']]],
+     write:['angle of incidence is measured from the NORMAL','90\u00B0 \u2212 30\u00B0 = 60\u00B0','angle of reflection = 60\u00B0'],
+     tip:'The angle of reflection always equals the angle of incidence.'},
+    {t:'Atoms: protons, neutrons, electrons', ex:'sodium: atomic number 11, mass number 23',
+     steps:[['Neutrons = mass number \u2212 atomic number',['2','3','\u2212','1','1','=']]],
+     write:['protons = atomic number = 11','electrons = protons = 11  (atom has no charge)','neutrons = 23 \u2212 11 = 12']},
+    {t:'Mass before = mass after', ex:'12 g + 32 g react to make one product',
+     steps:[['Add the reactants',['1','2','+','3','2','=']]],
+     write:['mass of reactants = 12 + 32 = 44 g','mass of product = 44 g','Same, so no mass is lost'],
+     tip:'Gas can escape from an open container. Then the mass looks smaller.'},
+    {t:'Rate of reaction', ex:'60 cm\u00B3 of gas in 20 s',
+     steps:[['Amount \u00F7 time',['6','0','\u00F7','2','0','=']]],
+     write:['rate = amount of gas \u00F7 time','= 60 cm\u00B3 \u00F7 20 s','= 3 cm\u00B3/s'],
+     tip:'Faster reaction: a bigger rate, or less time.'},
+    {t:'Breaths or pulse per minute', ex:'18 beats in 15 seconds',
+     steps:[['15 s is a quarter of a minute. \u00D7 4',['1','8','\u00D7','4','=']]],
+     write:['per minute = count \u00D7 4  (15 s \u00D7 4 = 60 s)','18 \u00D7 4 = 72 beats per minute'],
+     tip:'Counted for 30 s? \u00D7 2. Counted for 60 s? Use it as it is.'},
+    {t:'Food energy in a serving', ex:'1500 kJ per 100 g, eat 40 g',
+     steps:[['Per 100 g \u00F7 100 \u00D7 grams eaten',['1','5','0','0','\u00F7','1','0','0','\u00D7','4','0','=']]],
+     write:['energy = (per 100 g \u00F7 100) \u00D7 grams eaten','= 1500 \u00F7 100 \u00D7 40','= 600 kJ']},
+    {t:'Percentage change (growth)', ex:'height 140 cm to 147 cm',
+     steps:[['(new \u2212 old) \u00F7 old \u00D7 100',['(','1','4','7','\u2212','1','4','0',')','\u00F7','1','4','0','\u00D7','1','0','0','=']]],
+     write:['change = 147 \u2212 140 = 7 cm','% change = change \u00F7 start \u00D7 100','= 7 \u00F7 140 \u00D7 100 = 5%']},
+    {t:'Food chains: how many times bigger', ex:'plankton 0.04, fish 2 (example numbers)',
+     steps:[['new \u00F7 old',['2','\u00F7','0','.','0','4','=']]],
+     write:['times bigger = new amount \u00F7 old amount','2 \u00F7 0.04 = 50 times']},
+    
+    {g:'Blank page? Start here', t:'Freeze on a blank page', ex:'Q4(a)  Solve x\u00B3 = 343',
+     steps:[['Write the question number and copy the question. Copying needs no thinking.',[]],['Underline the numbers and the key word (solve, expand, factorise, round...).',[]],['Write the first line using the numbers. Any line of working can earn a mark. A blank earns none.',[]]],
+     write:['Q4(a)  x\u00B3 = 343','x = \u221B343','x = 7'],
+     tip:'Do step 1 even if your brain says "I do not know this one". The next line usually comes after the copying.'},
+    {t:'Key word \u2192 first line to write', ex:'',
+     steps:[['Factor trees, HCF, LCM: write the number at the top. Split it into 2 numbers that multiply to it.',[]],['Order decimals: write them in a column with the decimal points lined up. Add zeros: 23.660, 23.592, 23.600, 23.605.',[]],['Work out with brackets: do the bracket first. Write (\u22126) \u00F7 2.',[]],['Solve x\u00B3 = number: write x = \u221B(number).',[]],['Index form: same base. \u00D7 means ADD the powers. \u00F7 means SUBTRACT them.',[]],['Round: underline the digit you keep. Look at the next digit. 5 or more, go up.',[]],['Number line: draw the line. Filled dot for \u2264 \u2265. Empty dot for < >.',[]],['Expand: multiply the outside by every term inside the bracket. Write each product.',[]],['Factorise: find the biggest number and letter that go into every term. Write it outside a bracket.',[]]],
+     write:[], tip:'Mostly by hand. The calculator is for checking.'},
+    {g:'For the final: Fractions (Unit 7)', t:'Recurring decimals', ex:'2/7 as a decimal',
+     steps:[['Type the fraction',['FRAC','2','\u25BC','7','\u25B6','=']],['Flip to decimal',['S\u21D4D']]],
+     write:['2/7 = 2 \u00F7 7 = 0.285714285714...','The block 285714 repeats','Write 0.285714 with a dot over the 2 and over the 4'],
+     tip:'The screen shows about 10 digits. Look for the block that repeats.'},
+    {t:'Order fractions', ex:'3/4, 5/8, 2/3',
+     steps:[['Do each fraction, then flip to decimal',['FRAC','3','\u25BC','4','\u25B6','=','S\u21D4D']],['Repeat for the other two',[]]],
+     write:['3/4 = 0.75','5/8 = 0.625','2/3 = 0.667','Smallest to biggest: 5/8, 2/3, 3/4'],
+     tip:'Write the original fractions in the final answer, not the decimals.'},
+    {t:'Subtract mixed numbers', ex:'3 1/4 \u2212 1 5/6',
+     steps:[['Put each mixed number in a bracket',['(','3','+','FRAC','1','\u25BC','4','\u25B6',')','\u2212','(','1','+','FRAC','5','\u25BC','6','\u25B6',')','=']]],
+     write:['3 1/4 \u2212 1 5/6','= 13/4 \u2212 11/6','= 39/12 \u2212 22/12','= 17/12 = 1 5/12'],
+     tip:'If the screen shows 17/12, write it as 1 5/12 too.'},
+    {t:'Whole number \u00D7 mixed number', ex:'4 \u00D7 2 1/3',
+     steps:[['Type it',['4','\u00D7','(','2','+','FRAC','1','\u25BC','3','\u25B6',')','=']]],
+     write:['2 1/3 = 7/3','4 \u00D7 7/3 = 28/3','= 9 1/3']},
+    {t:'Whole number \u00F7 fraction', ex:'6 \u00F7 2/3',
+     steps:[['Type it',['6','\u00F7','FRAC','2','\u25BC','3','\u25B6','=']]],
+     write:['6 \u00F7 2/3','= 6 \u00D7 3/2  (flip, then multiply)','= 18/2 = 9']},
+    {t:'Simplify a fraction', ex:'18/24',
+     steps:[['Type it and press equals. It simplifies itself',['FRAC','1','8','\u25BC','2','4','\u25B6','=']]],
+     write:['18/24  (\u00F76 top and bottom)','= 3/4'],
+     tip:'Write the number you divided by. That is the working.'},
+    {g:'For the final: Circles and shapes (Unit 8)', t:'Circumference of a circle', ex:'diameter 10 cm',
+     steps:[['\u03C0 is SHIFT then \u00D710\u02E3',['SHIFT','x10']],['Full sum',['SHIFT','x10','\u00D7','1','0','=']],['Screen shows 10\u03C0. Flip to decimal',['S\u21D4D']]],
+     write:['C = \u03C0 \u00D7 d','C = \u03C0 \u00D7 10','C = 31.4 cm  (1 d.p.)'],
+     tip:'Given the radius? Use C = 2 \u00D7 \u03C0 \u00D7 r. Type 2 \u00D7 \u03C0 \u00D7 r.'},
+    {t:'Angles in a polygon', ex:'a hexagon (6 sides)',
+     steps:[['Total of the angles',['(','6','\u2212','2',')','\u00D7','1','8','0','=']],['One angle of a regular polygon',['\u00F7','6','=']]],
+     write:['(6 \u2212 2) \u00D7 180 = 720\u00B0','720 \u00F7 6 = 120\u00B0']},
+    {t:'Volume of a box', ex:'5 by 4 by 3 cm',
+     steps:[['Type it',['5','\u00D7','4','\u00D7','3','=']]],
+     write:['V = l \u00D7 w \u00D7 h','V = 5 \u00D7 4 \u00D7 3 = 60 cm\u00B3'],
+     tip:'Write the unit. cm\u00B3 for volume.'},
+    {g:'Science: physics, chemistry, biology', t:'Any science answer: 3 lines', ex:'',
+     steps:[['Line 1: write the formula in words.',[]],['Line 2: put the numbers in, with their units.',[]],['Line 3: write the answer and the unit.',[]]],
+     write:['speed = distance \u00F7 time','= 120 km \u00F7 1.5 h','= 80 km/h'],
+     tip:'Two marks usually come from the formula and the numbers. The answer alone is risky. Units: write them every time.'},
+    {t:'Very big or small numbers', ex:'3 \u00D7 10\u2078 m/s (speed of light)',
+     steps:[['Use the \u00D710\u02E3 key, not \u00D7 10',['3','x10','8','=']]],
+     write:['3 \u00D7 10\u2078 m/s'],
+     tip:'Type only the power (8). The key already includes the \u00D710.'},
+    {t:'Relative formula mass (chemistry)', ex:'H\u2082O: H = 1, O = 16',
+     steps:[['Atoms \u00D7 mass, then add',['2','\u00D7','1','+','1','6','=']]],
+     write:['H\u2082O = (2 \u00D7 1) + 16','= 18'],
+     tip:'Write the number of each atom first. The masses come from the periodic table.'},
+    {t:'Percentage (chemistry, biology)', ex:'12 g made out of 15 g possible',
+     steps:[['part \u00F7 whole \u00D7 100',['1','2','\u00F7','1','5','\u00D7','1','0','0','=']]],
+     write:['% = part \u00F7 whole \u00D7 100','= 12 \u00F7 15 \u00D7 100','= 80%']},
+    {t:'Mean of results (all sciences)', ex:'4, 6, 5 cm',
+     steps:[['Add in a bracket, then divide by how many',['(','4','+','6','+','5',')','\u00F7','3','=']]],
+     write:['mean = total \u00F7 how many','= (4 + 6 + 5) \u00F7 3','= 5 cm'],
+     tip:'Cross out any result that looks odd and say so. Round to the same decimal places as the data.'},
+    {t:'Magnification (biology)', ex:'image 24 mm, real size 0.3 mm',
+     steps:[['image \u00F7 real size',['2','4','\u00F7','0','.','3','=']]],
+     write:['magnification = image \u00F7 real','= 24 \u00F7 0.3','= \u00D780'],
+     tip:'Same units on top and bottom. Convert first if they differ.'},
+    {g:'Earlier units (could be on the final)', t:'Add / take away fractions', ex:'2/3 + 3/4',
+     steps:[['Type the sum',['FRAC','2','\u25BC','3','\u25B6','+','FRAC','3','\u25BC','4','\u25B6','=']]],
+     write:['2/3 + 3/4','= 8/12 + 9/12  (same bottom number)','= 17/12 = 1 5/12'],
+     tip:'\u25BC moves to the bottom number. \u25B6 moves out of the fraction. The calculator skips the "same bottom number" step. Write it yourself.'},
+    {t:'Solve an equation', ex:'3x + 5 = 20',
+     steps:[['Type the equation (X = ALPHA + ), = is ALPHA + CALC)',['3','X','+','5','EQ','2','0']],['Solve',['SOLVE']],['If it asks for X, press',['=']]],
+     write:['3x + 5 = 20','3x = 20 \u2212 5 = 15  (take 5 from both sides)','x = 15 \u00F7 3 = 5','Check: 3\u00D75 + 5 = 20'],
+     tip:'The calculator only gives x = 5. Write each step above. Use SOLVE to check.'},
+    {t:'Put a number into an expression', ex:'3x\u00B2 \u2212 2x + 1 when x = 4',
+     steps:[['Type the expression',['3','X','x\u00B2','\u2212','2','X','+','1']],['Press CALC, then type the number',['CALC','4','=']]],
+     write:['x = 4','3(4)\u00B2 \u2212 2(4) + 1','= 48 \u2212 8 + 1 = 41']},
+    {t:'Cube roots and powers', ex:'\u221B343, \u221B(\u2212216), 2\u2075',
+     steps:[['Cube root. Type the 3 first, then \u25B6',['SHIFT','POW','3','\u25B6','3','4','3','=']],['Negative inside? Use (\u2212)',['SHIFT','POW','3','\u25B6','(\u2212)','2','1','6','=']],['Power',['2','POW','5','=']]],
+     write:['\u221B343 = 7  because 7\u00D77\u00D77 = 343','\u221B(\u2212216) = \u22126','2\u2075 = 2\u00D72\u00D72\u00D72\u00D72 = 32']},
+    {t:'Brackets and negatives', ex:'(\u221212 + 6) \u00F7 2',
+     steps:[['Use the (\u2212) key for a negative number',['(','(\u2212)','1','2','+','6',')','\u00F7','2','=']]],
+     write:['(\u221212 + 6) = \u22126','\u22126 \u00F7 2 = \u22123'],
+     tip:'\u2212 is take away. (\u2212) is a negative number. The calculator does the order, you write the order.'},
+    {t:'Round to decimal places', ex:'7 \u00F7 3 to 2 d.p.',
+     steps:[['Set it',['SHIFT','MODE','6','2']],['Calculate',['7','\u00F7','3','=']],['Turn rounding OFF after',['SHIFT','MODE','8','1']]],
+     write:['7 \u00F7 3 = 2.333...','\u2248 2.33  (2 d.p.)']},
+    {t:'Calculator acting weird?', ex:'',
+     steps:[['Answers look wrong? Fix the display',['SHIFT','MODE','1']],['Still weird? Reset everything',['SHIFT','9','3','=','=']]],
+     write:[], tip:'Reset clears saved numbers too. Look for "Math" at the top of the screen.'}
+  ];
+  const CALC_GROUPS = [
+    {e:'\uD83C\uDD98', s:'Start', g:'Blank page? Start here', titles:['Freeze on a blank page','Key word \u2192 first line to write']},
+    {e:'\u2797', s:'Fractions', g:'Maths: fractions and decimals (on the final)', titles:['Recurring decimals','Order fractions','Subtract mixed numbers','Whole number \u00D7 mixed number','Whole number \u00F7 fraction','Simplify a fraction','Add / take away fractions','Round to decimal places']},
+    {e:'\uD83D\uDCD0', s:'Shapes', g:'Maths: circles and shapes (on the final)', titles:['Circumference of a circle','Angles in a polygon','Volume of a box']},
+    {e:'\uD83D\uDD22', s:'Algebra', g:'Maths: algebra and number', titles:['Solve an equation','Put a number into an expression','Cube roots and powers','Brackets and negatives']},
+    {e:'\uD83D\uDD2C', s:'Science', g:'All sciences', titles:['Any science answer: 3 lines','Mean of results (all sciences)','Percentage (chemistry, biology)','Very big or small numbers']},
+        {e:'\u26A1', s:'Physics', g:'Physics: forces, pressure, light, electricity', titles:['Speed, distance, time (physics)','Distance-time graph: find the speed','Turning forces (moments)','Pressure','Circuits: add the voltages','Light: angle of incidence']},
+        {e:'\uD83E\uDDEA', s:'Chem', g:'Chemistry: atoms and reactions', titles:['Atoms: protons, neutrons, electrons','Relative formula mass (chemistry)','Mass before = mass after','Rate of reaction']},
+        {e:'\uD83C\uDF31', s:'Bio', g:'Biology: breathing, ecosystems, diet', titles:['Breaths or pulse per minute','Food energy in a serving','Percentage change (growth)','Food chains: how many times bigger','Magnification (biology)']},
+    {e:'\uD83D\uDD27', s:'Fix it', g:'Calculator problems', titles:['Calculator acting weird?']}
+  ];
+  function calcChips(tokens){
+    const out = [];
+    tokens.forEach(t => (CALC_MACROS[t] || [t]).forEach(x => out.push(x)));
+    return out.map(t => {
+      const cls = t === 'SHIFT' ? 'k k-shift' : (t === 'ALPHA' ? 'k k-alpha' : 'k');
+      return '<span class="' + cls + '">' + (CALC_LABELS[t] || t) + '</span>';
+    }).join('');
+  }
+  function renderCalcGuide(){
+    const wrap = el('calcGuide');
+    if(!wrap) return;
+    wrap.innerHTML = '<div class="calc-rule"><h2>Show your thinking</h2><ol><li>Copy the question onto your page.</li><li>Write each step. One line each.</li><li>Write the answer. Check it.</li></ol></div>' +
+      '<div class="calc-legend"><span class="k k-shift">SHIFT</span> yellow key <span class="k k-alpha">ALPHA</span> red key. Press one at a time, not together.</div>';
+    const list = document.createElement('div');
+    const heads = {};
+    CALC_GROUPS.forEach(grp => {
+      const gh = document.createElement('div'); gh.className = 'block-title'; gh.style.fontSize = '13px'; gh.textContent = grp.e + ' ' + grp.g; list.appendChild(gh); heads[grp.s] = gh;
+      grp.titles.forEach(title => {
+      const r = CALC_RECIPES.find(x => x.t === title); if(!r) return;
+      const card = document.createElement('div');
+      card.className = 'situation-card';
+      const head = document.createElement('div');
+      head.className = 'situation-head';
+      head.innerHTML = '<div class="situation-icon">' + grp.e + '</div><div class="situation-label">' + r.t + '</div>' +
+        '<svg class="situation-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+      const det = document.createElement('div');
+      det.className = 'situation-detail';
+      let h = r.ex ? '<div class="calc-ex">Example: <b>' + r.ex + '</b></div>' : '';
+      r.steps.forEach((s, i) => {
+        h += '<div class="calc-step"><div class="calc-step-label"><b>' + (i + 1) + '</b> ' + s[0] + '</div>' + calcChips(s[1]) + '</div>';
+      });
+      if(r.write.length){
+        h += '<div class="write-box"><div class="wb-title">' + ICONS.marker + 'Write this on your page</div>' +
+          r.write.map(l => '<div class="wb-line">' + l + '</div>').join('') + '</div>';
+      }
+      if(r.tip) h += '<div class="calc-tip">' + r.tip + '</div>';
+      det.innerHTML = h;
+      const used = !!state.calcUsed[r.t];
+      const urow = document.createElement('div');
+      urow.className = 'mission-row';
+      urow.style.cssText = 'margin-top:12px; border-top:1px solid var(--line); border-bottom:none;';
+      urow.innerHTML = '<div class="mission-check ' + (used ? 'done' : '') + '">' + CHECK_SVG + '</div><div class="mission-text">I used this today</div>';
+      urow.onclick = async () => {
+        const nowUsed = !state.calcUsed[r.t];
+        state.calcUsed[r.t] = nowUsed;
+        urow.querySelector('.mission-check').classList.toggle('done', nowUsed);
+        await saveJSON(todayKey('calc-used'), state.calcUsed);
+        if(nowUsed && !state.calcUsedXPGiven[r.t] && Object.keys(state.calcUsedXPGiven).length < 5){
+          state.calcUsedXPGiven[r.t] = true;
+          await saveJSON(todayKey('calc-used-xp'), state.calcUsedXPGiven);
+          await adjustXP(5);
+          popFloatXP(urow, 5);
+        }
+      };
+      det.appendChild(urow);
+      head.onclick = () => {
+        const open = !card.classList.contains('open');
+        list.querySelectorAll('.situation-card').forEach(c => c.classList.remove('open'));
+        if(open) card.classList.add('open');
+      };
+      card.appendChild(head); card.appendChild(det); list.appendChild(card);
+      });
+    });
+    const chips = document.createElement('div');
+    chips.className = 'subtab-row';
+    CALC_GROUPS.forEach(grp => {
+      const b = document.createElement('button');
+      b.className = 'subtab-btn';
+      b.textContent = grp.e + ' ' + grp.s;
+      b.onclick = () => heads[grp.s].scrollIntoView({behavior: state.quietMode ? 'auto' : 'smooth', block: 'start'});
+      chips.appendChild(b);
+    });
+    wrap.appendChild(chips);
+    wrap.appendChild(list);
   }
 
   /* ===== REMINDERS ===== */
@@ -2272,6 +2525,8 @@
     examMode: false,
     examMissions: {},
     examMissionsXPGiven: {},
+    calcUsed: {},
+    calcUsedXPGiven: {},
     examChecks: {},
     examChecksXPGiven: {}
   };
@@ -2948,6 +3203,7 @@
   async function init(){
     renderNavIcons();
     initMathTools();
+    renderCalcGuide();
     el('dateLabel').textContent = fmtDate();
     const vs = el('versionStamp');
     if(vs) vs.textContent = 'v' + APP_VERSION;
@@ -2955,6 +3211,9 @@
     state.missionsXPGiven = await loadJSON(todayKey('missions-xp'), {});
     state.examMissions = await loadJSON(todayKey('exam-missions'), {});
     state.examMissionsXPGiven = await loadJSON(todayKey('exam-missions-xp'), {});
+    state.calcUsed = await loadJSON(todayKey('calc-used'), {});
+    state.calcUsedXPGiven = await loadJSON(todayKey('calc-used-xp'), {});
+    renderCalcGuide();
     const ladderToday = await loadJSON(todayKey('ladder'), {v:0});
     state.ladderToday = ladderToday.v || 0;
     const best = await loadJSON('ladder-best', {v:0});
